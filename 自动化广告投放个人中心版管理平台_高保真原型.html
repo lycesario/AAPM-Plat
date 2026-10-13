@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>自动化广告投放个人中心管理平台 · 高保真原型</title>
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:14px;
+}
+html[data-theme="dark"]{
+  --bg:#0a0c15; --bg2:#0c0f1a; --panel:#111527; --panel2:#161b31; --elev:#1b2139;
+  --line:#1f2540; --line2:#2b3354;
+  --ink:#e9edfb; --ink2:#9aa5c4; --ink3:#5d6a89;
+  --brand:#4f6cff; --brand2:#8b5cf6; --brand-bg:rgba(79,108,255,.14);
+  --gold:#f0b90b; --gold-bg:rgba(240,185,11,.10);
+  --ok:#12c48b; --ok-bg:rgba(18,196,139,.11);
+  --bad:#f2455f; --bad-bg:rgba(242,69,95,.11);
+  --warn:#f0b90b;
+  --shadow:0 14px 46px rgba(0,0,0,.5);
+  --glow:0 0 0 1px rgba(79,108,255,.25),0 10px 34px rgba(79,108,255,.12);
+}
+html[data-theme="light"]{
+  --bg:#f3f5fc; --bg2:#edf0f9; --panel:#ffffff; --panel2:#f7f9fe; --elev:#ffffff;
+  --line:#e3e8f4; --line2:#d2daea;
+  --ink:#131a2c; --ink2:#55607c; --ink3:#939db6;
+  --brand:#2f52e0; --brand2:#7038e0; --brand-bg:rgba(47,82,224,.09);
+  --gold:#a8790a; --gold-bg:rgba(240,185,11,.14);
+  --ok:#0a9f70; --ok-bg:rgba(18,196,139,.12);
+  --bad:#dc2f4a; --bad-bg:rgba(242,69,95,.09);
+  --warn:#a8790a;
+  --shadow:0 14px 38px rgba(28,40,74,.14);
+  --glow:0 0 0 1px rgba(47,82,224,.18),0 8px 28px rgba(47,82,224,.10);
+}
+html,body{height:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow:hidden}
+b{font-weight:660}em{font-style:normal}a{color:inherit;text-decoration:none;cursor:pointer}
+.num,.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.2px}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:8px;border:2px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:var(--ink3);background-clip:content-box}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ---------------- 布局骨架 ---------------- */
+.wb{display:flex;height:100vh;overflow:hidden}
+.side{width:242px;flex:0 0 242px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:30}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.content{flex:1;overflow-y:auto;padding:22px 26px 70px;position:relative}
+
+/* ---------------- 侧栏 ---------------- */
+.side-brand{display:flex;align-items:center;gap:10px;padding:16px 16px 12px}
+.brand-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;color:#fff;font-weight:800;font-size:15px;flex:0 0 34px;box-shadow:var(--glow)}
+.side-brand b{font-size:14.5px;letter-spacing:.2px;display:block}
+.side-brand em{font-size:10.5px;color:var(--ink3);display:block;margin-top:1px}
+.role-switch{margin:4px 12px 8px;position:relative}
+.role-switch select{width:100%;appearance:none;background:var(--elev);border:1px solid var(--line2);color:var(--ink);border-radius:9px;padding:7px 26px 7px 10px;font-size:12px;font-family:inherit;cursor:pointer}
+.role-switch:after{content:"\25BE";position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--ink3);pointer-events:none;font-size:11px}
+.role-switch .rs-lb{font-size:10px;color:var(--ink3);letter-spacing:1.5px;margin-bottom:5px;text-transform:uppercase}
+.side-nav{flex:1;overflow-y:auto;padding:4px 10px 14px}
+.nav-group{font-size:10px;color:var(--ink3);letter-spacing:1.6px;text-transform:uppercase;padding:14px 8px 5px}
+.nav-group .ng-d{font-size:10px;color:var(--ink3);letter-spacing:.2px;text-transform:none;opacity:.72;font-weight:400;display:block}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8.5px 10px;border-radius:9px;color:var(--ink2);font-size:13px;cursor:pointer;margin:1px 0;position:relative;transition:background .15s,color .15s}
+.nav-item:hover{background:var(--panel2);color:var(--ink)}
+.nav-item.on{background:var(--brand-bg);color:var(--ink);font-weight:620}
+.nav-item.on:before{content:"";position:absolute;left:-10px;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;background:var(--brand)}
+.nav-item .ni{width:18px;text-align:center;font-size:13.5px;flex:0 0 18px;opacity:.9}
+.nav-item .cnt{margin-left:auto;font-size:10px;background:var(--bad-bg);color:var(--bad);padding:1px 6px;border-radius:8px;font-family:var(--mono)}
+.nav-item .cnt.k{background:var(--gold-bg);color:var(--gold)}
+.nav-item.locked{opacity:.34;cursor:not-allowed}
+.nav-item.locked:hover{background:none;color:var(--ink2)}
+.side-foot{border-top:1px solid var(--line);padding:10px 14px 12px}
+.env-chip{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--ink3);margin-bottom:9px}
+.env-chip i{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok)}
+.side-user{display:flex;align-items:center;gap:9px}
+.uav{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;flex:0 0 30px}
+.side-user b{font-size:12.5px;display:block}
+.side-user em{font-size:10.5px;color:var(--ink3);display:block}
+
+/* ---------------- 顶栏 ---------------- */
+.topbar{height:54px;flex:0 0 54px;border-bottom:1px solid var(--line);background:var(--panel);display:flex;align-items:center;gap:12px;padding:0 16px;z-index:40}
+.topnav{display:flex;align-items:center;gap:1px;overflow-x:auto;flex:1 1 auto;min-width:0;scrollbar-width:none}
+.topnav::-webkit-scrollbar{display:none}
+.tn-item{position:relative;display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:9px;color:var(--ink2);font-size:12.5px;font-weight:560;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s;flex:0 0 auto}
+.tn-item:hover{color:var(--ink);background:var(--panel2)}
+.tn-item.on{color:var(--brand);background:var(--brand-bg);font-weight:660}
+.tn-item.on:after{content:"";position:absolute;left:13px;right:13px;bottom:-10px;height:2.5px;border-radius:2px;background:linear-gradient(90deg,var(--brand),var(--brand2))}
+.tn-item .tn-badge{font-style:normal;min-width:16px;height:16px;border-radius:8px;background:var(--bad);color:#fff;font-size:9.5px;font-weight:700;display:grid;place-items:center;padding:0 4px;font-family:var(--mono)}
+.tn-item.on .tn-badge{box-shadow:0 0 0 3px var(--brand-bg)}
+.top-search{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:6px 12px;color:var(--ink3);font-size:12px;cursor:pointer;flex:0 1 auto;width:250px;min-width:0;overflow:hidden}
+.top-search .ph{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-search:hover{border-color:var(--line2)}
+.top-search kbd{margin-left:auto;font-family:var(--mono);font-size:10px;background:var(--elev);border:1px solid var(--line2);border-radius:5px;padding:1px 5px;color:var(--ink3)}
+.top-acts{display:flex;gap:8px;align-items:center}
+
+/* ---------------- 副栏 ---------------- */
+.subbar{height:38px;flex:0 0 38px;display:flex;align-items:center;gap:10px;padding:0 22px;border-bottom:1px solid var(--line);background:var(--bg2);font-size:12px;color:var(--ink2)}
+.sub-sp{flex:1}
+.crumb{display:flex;align-items:center;gap:7px;font-size:12.5px;min-width:0}
+.crumb .cb-g{color:var(--ink3);font-weight:500;white-space:nowrap}
+.crumb .cb-sep{color:var(--ink3);font-style:normal;opacity:.55}
+.crumb b{font-weight:660;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub-right{display:flex;align-items:center;gap:14px;font-size:11px;color:var(--ink3);white-space:nowrap}
+.sub-right .cb-env{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:2px 8px;font-size:10px;letter-spacing:.5px;font-family:var(--mono)}
+
+/* ---------------- 通用元件 ---------------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line2);background:var(--elev);color:var(--ink);border-radius:9px;padding:7px 14px;font-size:12.5px;font-family:inherit;cursor:pointer;transition:.15s;white-space:nowrap}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.btn.p{background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent;color:#fff}
+.btn.p:hover{filter:brightness(1.12);color:#fff}
+.btn.danger{background:var(--bad-bg);border-color:rgba(242,69,95,.35);color:var(--bad)}
+.btn.danger:hover{border-color:var(--bad);color:var(--bad)}
+.btn.warn{background:var(--gold-bg);border-color:rgba(240,185,11,.35);color:var(--gold)}
+.btn.ok{background:var(--ok-bg);border-color:rgba(18,196,139,.35);color:var(--ok)}
+.btn.sm{padding:4px 10px;font-size:11.5px;border-radius:7px}
+.btn.lg{padding:9px 20px;font-size:13px}
+.btn:disabled{opacity:.42;cursor:not-allowed}
+.btn-row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;padding:2px 8px;border-radius:6px;background:var(--panel2);border:1px solid var(--line);color:var(--ink2);white-space:nowrap;line-height:1.5}
+.tag.b{background:var(--brand-bg);color:var(--brand);border-color:transparent}
+.tag.ok{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+.tag.bad{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+.tag.warn{background:var(--gold-bg);color:var(--gold);border-color:transparent}
+.tag.gold{background:var(--gold-bg);color:var(--gold);border-color:rgba(240,185,11,.25)}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:1px}
+.dot.ok{background:var(--ok)}.dot.bad{background:var(--bad)}.dot.warn{background:var(--gold)}.dot.idle{background:var(--ink3)}.dot.b{background:var(--brand)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.panel-h{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);font-size:13.5px;font-weight:660}
+.panel-h .sub{font-size:11px;color:var(--ink3);font-weight:400;margin-left:auto;display:flex;gap:8px;align-items:center}
+.panel-b{padding:16px}
+.panel-b.tight{padding:0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px 16px;position:relative;overflow:hidden;transition:border-color .18s,transform .18s}
+.kpi:hover{border-color:var(--line2)}
+.kpi.hl{border-color:rgba(79,108,255,.4)}
+.kpi .k-lb{font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:6px;padding-right:6px}
+.kpi .k-v{font-size:24px;font-weight:750;letter-spacing:-.8px;margin-top:5px;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.kpi .k-v.sm{font-size:19px}
+.kpi .k-foot{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:11px;color:var(--ink3);flex-wrap:wrap}
+.kpi .spark{position:absolute;right:10px;bottom:10px;opacity:.9}
+.k-pair{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;color:var(--ink3);border:1px dashed var(--line2);border-radius:5px;padding:1px 6px}
+.ring{width:44px;height:44px;flex:0 0 44px}
+
+table.dt{width:100%;border-collapse:collapse;font-size:12.3px}
+.dt th{text-align:left;font-size:10.5px;color:var(--ink3);font-weight:600;letter-spacing:.6px;padding:9px 14px;border-bottom:1px solid var(--line);background:var(--panel2);position:sticky;top:0;z-index:2;white-space:nowrap}
+.dt td{padding:9.5px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.dt tbody tr{transition:background .12s}
+.dt tbody tr:hover{background:var(--panel2)}
+.dt tbody tr:last-child td{border-bottom:none}
+.dt .r{text-align:right}.dt .c{text-align:center}
+.dt .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.dt .link{color:var(--brand);cursor:pointer;font-weight:560}
+.dt .link:hover{text-decoration:underline}
+.dt tr.rowlink{cursor:pointer}
+.dt .tbl-wrap{max-height:520px;overflow:auto}
+.tbar{display:flex;align-items:center;gap:9px;padding:11px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tbar .sp{flex:1}
+.inp{background:var(--panel2);border:1px solid var(--line2);color:var(--ink);border-radius:8px;padding:6.5px 11px;font-size:12.3px;font-family:inherit;outline:none;transition:border .15s;max-width:100%}
+.inp:focus{border-color:var(--brand)}
+.inp::placeholder{color:var(--ink3)}
+select.inp{cursor:pointer}
+textarea.inp{resize:vertical;line-height:1.7}
+.fld{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+.fld>label{font-size:11.5px;color:var(--ink2);font-weight:560}
+.fld .hint{font-size:10.5px;color:var(--ink3)}
+.fld .req:after{content:" *";color:var(--bad)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.g13{display:grid;grid-template-columns:1fr 2fr;gap:12px}
+.g31{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+.pager{display:flex;align-items:center;gap:6px;padding:11px 14px;font-size:11.5px;color:var(--ink3);flex-wrap:wrap}
+.pager .pg{min-width:26px;height:26px;border:1px solid var(--line2);border-radius:7px;display:grid;place-items:center;cursor:pointer;background:var(--elev);font-family:var(--mono);padding:0 6px}
+.pager .pg.on{background:var(--brand-bg);border-color:var(--brand);color:var(--brand);font-weight:660}
+
+.stepper{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding:6px 0}
+.stepper .stp{display:flex;flex-direction:column;align-items:center;min-width:92px;flex:1;position:relative}
+.stepper .stp:before{content:"";position:absolute;top:11px;left:-50%;right:50%;height:2px;background:var(--line2)}
+.stepper .stp:first-child:before{display:none}
+.stepper .stp.done:before{background:var(--ok)}
+.stepper .stp.act:before{background:var(--brand)}
+.stepper .stp .si{width:23px;height:23px;border-radius:50%;background:var(--elev);border:2px solid var(--line2);display:grid;place-items:center;font-size:10.5px;font-family:var(--mono);position:relative;z-index:1;color:var(--ink3)}
+.stepper .stp.done .si{background:var(--ok);border-color:var(--ok);color:#fff}
+.stepper .stp.act .si{border-color:var(--brand);color:var(--brand);box-shadow:0 0 0 4px var(--brand-bg)}
+.stepper .stp.bad .si{border-color:var(--bad);color:var(--bad);box-shadow:0 0 0 4px var(--bad-bg)}
+.stepper .stp.hold .si{border-color:var(--gold);color:var(--gold)}
+.stepper .stp span{font-size:10.5px;color:var(--ink3);margin-top:7px;text-align:center;line-height:1.4}
+.stepper .stp.act span{color:var(--ink);font-weight:600}
+
+.tl{position:relative;padding-left:18px}
+.tl:before{content:"";position:absolute;left:5px;top:4px;bottom:4px;width:1.5px;background:var(--line2)}
+.tl-item{position:relative;padding:0 0 15px 10px}
+.tl-item:before{content:"";position:absolute;left:-17px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--ink3);border:2px solid var(--panel)}
+.tl-item.ok:before{background:var(--ok)}
+.tl-item.warn:before{background:var(--gold)}
+.tl-item.bad:before{background:var(--bad)}
+.tl-item.brand:before{background:var(--brand)}
+.tl-item .tl-t{font-size:12px;font-weight:600}
+.tl-item .tl-d{font-size:11px;color:var(--ink3);margin-top:2px;line-height:1.65}
+
+.note{display:flex;gap:9px;border-radius:10px;padding:10px 13px;font-size:12px;line-height:1.7;margin-bottom:12px;border:1px solid}
+.note .ni{font-size:13px;flex:0 0 16px}
+.note.info{background:var(--brand-bg);border-color:rgba(79,108,255,.25);color:var(--ink)}
+.note.ok{background:var(--ok-bg);border-color:rgba(18,196,139,.25);color:var(--ink)}
+.note.warn{background:var(--gold-bg);border-color:rgba(240,185,11,.3);color:var(--ink)}
+.note.bad{background:var(--bad-bg);border-color:rgba(242,69,95,.3);color:var(--ink)}
+.note b{font-weight:660}
+
+/* 规则标注（致命规则浮现） */
+.rule-anno{display:none;border:1.5px dashed var(--gold);background:var(--gold-bg);border-radius:10px;padding:9px 13px;font-size:11.5px;color:var(--ink);line-height:1.72;margin:8px 0}
+.rule-anno b{color:var(--gold)}
+.wb.rule-on .rule-anno{display:block}
+.wb.rule-on [data-rulechip]{outline:1.5px dashed var(--gold);outline-offset:2px;border-radius:6px}
+
+/* 抽屉 / 模态 / 命令面板 */
+.drawer-mask,.modal-mask,.pal-mask{position:fixed;inset:0;background:rgba(4,6,14,.62);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .22s;z-index:80}
+.drawer-mask.on,.modal-mask.on,.pal-mask.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:-620px;width:620px;max-width:94vw;height:100vh;background:var(--panel);border-left:1px solid var(--line2);z-index:90;transition:right .28s cubic-bezier(.3,.9,.3,1);display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.drawer.wide{width:820px}
+.drawer.on{right:0}
+.drawer-h{display:flex;align-items:center;gap:10px;padding:15px 20px;border-bottom:1px solid var(--line);flex:0 0 auto}
+.drawer-h b{font-size:14.5px}
+.drawer-h .x{margin-left:auto;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;cursor:pointer;color:var(--ink3);border:1px solid var(--line)}
+.drawer-h .x:hover{color:var(--ink);border-color:var(--line2)}
+.drawer-b{flex:1;overflow-y:auto;padding:18px 20px 30px}
+.drawer-f{border-top:1px solid var(--line);padding:13px 20px;display:flex;gap:9px;background:var(--panel);flex:0 0 auto}
+.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.97);width:480px;max-width:92vw;background:var(--panel);border:1px solid var(--line2);border-radius:16px;z-index:95;opacity:0;pointer-events:none;transition:.2s;box-shadow:var(--shadow)}
+.modal.wide{width:720px}
+.modal.wide2{width:900px}
+.modal.wide3{width:1080px}
+.modal.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.modal-h{padding:16px 20px 0;font-size:15px;font-weight:700;position:relative;padding-right:46px}
+.modal-h .tag{margin-left:7px;vertical-align:1px}
+.mh-sub{font-size:11.5px;color:var(--ink3);font-weight:500;margin-top:5px;line-height:1.65}
+.mh-x{position:absolute;right:14px;top:13px;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink3);font-size:15px;transition:.15s;z-index:2}
+.mh-x:hover{background:var(--panel2);color:var(--ink)}
+.modal-b{padding:14px 20px;max-height:64vh;overflow-y:auto}
+.modal-b::-webkit-scrollbar{width:8px}
+.modal-b::-webkit-scrollbar-thumb{background:var(--line2);border-radius:5px}
+.modal-f{padding:0 20px 18px;display:flex;gap:9px;justify-content:flex-end;align-items:center}
+.modal-f .fgrow{flex:1;font-size:11.5px;color:var(--ink3);line-height:1.5}
+.modal-f .fr{display:flex;gap:9px}
+.palette{position:fixed;left:50%;top:12vh;transform:translateX(-50%) scale(.98);width:620px;max-width:92vw;background:var(--panel);border:1px solid var(--line2);border-radius:16px;z-index:95;opacity:0;pointer-events:none;transition:.18s;box-shadow:var(--shadow);overflow:hidden}
+.palette.on{opacity:1;pointer-events:auto;transform:translateX(-50%) scale(1)}
+.palette .pal-in{width:100%;background:transparent;border:none;outline:none;color:var(--ink);font-size:14.5px;padding:16px 20px;border-bottom:1px solid var(--line);font-family:inherit}
+.pal-list{max-height:52vh;overflow-y:auto;padding:8px}
+.pal-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:12.8px;color:var(--ink2)}
+.pal-item:hover,.pal-item.on{background:var(--brand-bg);color:var(--ink)}
+.pal-item .pi{width:20px;text-align:center}
+.pal-item .pk{margin-left:auto;font-size:10px;color:var(--ink3);font-family:var(--mono)}
+.pal-empty{padding:26px;text-align:center;color:var(--ink3);font-size:12.5px}
+.pal-hd{font-size:10px;color:var(--ink3);letter-spacing:1.4px;text-transform:uppercase;padding:10px 14px 4px}
+
+.toasts{position:fixed;top:16px;right:18px;z-index:120;display:flex;flex-direction:column;gap:9px;max-width:400px}
+.toast{display:flex;gap:9px;align-items:flex-start;background:var(--elev);border:1px solid var(--line2);border-left:3px solid var(--brand);border-radius:11px;padding:11px 15px;font-size:12.5px;box-shadow:var(--shadow);animation:tin .25s ease-out;line-height:1.6}
+.toast.ok{border-left-color:var(--ok)}
+.toast.bad{border-left-color:var(--bad)}
+.toast.warn{border-left-color:var(--gold)}
+@keyframes tin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+
+@keyframes fup{0%{background:var(--bad-bg)}100%{background:transparent}}
+@keyframes fdn{0%{background:var(--ok-bg)}100%{background:transparent}}
+.fx-up{animation:fup .7s ease-out}
+.fx-down{animation:fdn .7s ease-out}
+.up{color:var(--ok)}
+.down{color:var(--bad)}
+
+.sec-title{display:flex;align-items:baseline;gap:10px;margin:26px 0 12px}
+.sec-title:first-child{margin-top:0}
+.sec-title b{font-size:15px;font-weight:700}
+.sec-title em{font-size:11.5px;color:var(--ink3)}
+.sec-title .sp{flex:1}
+.muted{color:var(--ink3)}
+.small{font-size:11.5px}
+.divider{height:1px;background:var(--line);margin:14px 0}
+.kv{display:flex;justify-content:space-between;gap:14px;padding:7px 0;font-size:12.3px;border-bottom:1px dashed var(--line)}
+.kv:last-child{border-bottom:none}
+.kv .k{color:var(--ink3);flex:0 0 auto}
+.kv .v{text-align:right;word-break:break-word}
+.avatar{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700;flex:0 0 28px}
+.chart-box{position:relative}
+canvas{display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--ink3)}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.progress{height:6px;border-radius:4px;background:var(--panel2);overflow:hidden}
+.progress i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--brand),var(--brand2))}
+.progress.ok i{background:var(--ok)}.progress.bad i{background:var(--bad)}.progress.gold i{background:var(--gold)}
+.switch{width:34px;height:19px;border-radius:12px;background:var(--line2);position:relative;cursor:pointer;transition:.18s;flex:0 0 34px;display:inline-block}
+.switch:after{content:"";position:absolute;left:2px;top:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:.18s}
+.switch.on{background:var(--ok)}
+.switch.on:after{left:17px}
+.banner-live{display:flex;align-items:center;gap:7px;font-size:10.5px;color:var(--ok)}
+.banner-live i{width:7px;height:7px;border-radius:50%;background:var(--ok);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.page-in{animation:pageIn .3s cubic-bezier(.25,.8,.3,1)}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.wb.folded .side{width:64px;flex:0 0 64px}
+.wb.folded .sb-txt{display:none}
+.wb.folded .role-switch,.wb.folded .side-brand em{display:none}
+.wb.folded .side-brand{justify-content:center;padding:16px 8px 10px}
+.wb.folded .nav-item{justify-content:center;padding:9px 0}
+.wb.folded .nav-item .cnt{position:absolute;top:2px;right:6px;margin:0;font-size:9px}
+.wb.folded .side-foot{padding:10px 8px}
+.wb.folded .side-user{justify-content:center}
+.wb.folded .top-search .ph{display:none}
+.wb.folded .top-search{min-width:0}
+
+.tb-icon{position:relative;width:32px;height:32px;border:1px solid var(--line);background:var(--panel2);color:var(--ink2);border-radius:9px;font-size:14px;cursor:pointer;display:grid;place-items:center;transition:.15s;font-family:inherit}
+.tb-icon:hover{color:var(--ink);border-color:var(--brand)}
+.tb-icon.on{color:var(--gold);border-color:rgba(240,185,11,.45);background:var(--gold-bg)}
+.bell-wrap{position:relative}
+.bell-badge{display:none;position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;border-radius:9px;background:var(--bad);color:#fff;font-size:9.5px;font-weight:700;place-items:center;padding:0 4px;font-style:normal}
+.bell-panel{position:absolute;right:0;top:42px;width:400px;max-height:74vh;overflow-y:auto;background:var(--panel);border:1px solid var(--line2);border-radius:14px;box-shadow:var(--shadow);z-index:60;opacity:0;pointer-events:none;transform:translateY(-6px);transition:.18s}
+.bell-wrap.open .bell-panel{opacity:1;pointer-events:auto;transform:none}
+.bp-h{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line);font-size:13px;font-weight:660;position:sticky;top:0;background:var(--panel)}
+.bp-item{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .12s}
+.bp-item:hover{background:var(--panel2)}
+.bp-item:last-of-type{border-bottom:none}
+.bp-item .bp-ic{font-size:15px;width:22px;text-align:center;flex:0 0 22px}
+.bp-item b{font-size:12.3px;display:block}
+.bp-item.read{opacity:.5}
+.bp-f{padding:9px 14px;background:var(--panel2);color:var(--ink3)}
+
+.login-mask{position:fixed;inset:0;z-index:200;display:grid;place-items:center;
+  background:radial-gradient(1200px 700px at 18% -10%,rgba(79,108,255,.18),transparent 60%),
+             radial-gradient(900px 640px at 92% 112%,rgba(139,92,246,.14),transparent 55%),var(--bg);
+  transition:opacity .45s,visibility .45s}
+.login-mask.bye{opacity:0;visibility:hidden}
+.login-card{width:420px;max-width:92vw;background:var(--panel);border:1px solid var(--line2);border-radius:20px;padding:30px 30px 22px;box-shadow:0 30px 90px rgba(0,0,0,.55);animation:loginIn .5s cubic-bezier(.2,.9,.3,1)}
+@keyframes loginIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+.login-brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.login-brand b{font-size:16.5px;display:block;letter-spacing:.2px}
+.login-brand em{font-size:11px;color:var(--ink3);display:block;margin-top:2px}
+.brand-mark.lg{width:44px;height:44px;flex:0 0 44px;border-radius:13px;font-size:20px}
+.login-note{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ink2);background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 12px;margin-bottom:16px}
+.login-foot{margin-top:14px;text-align:center;line-height:1.7}
+.sso-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+.sso{display:flex;align-items:center;gap:7px;border:1px solid var(--line2);background:var(--elev);border-radius:9px;padding:9px 11px;font-size:12px;cursor:pointer;color:var(--ink2);transition:.15s}
+.sso:hover{border-color:var(--brand);color:var(--brand)}
+
+/* 通用业务元件 */
+.elcard{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:12px 13px;position:relative}
+.elcard .ec-n{font-size:10px;font-family:var(--mono);color:var(--brand);letter-spacing:1px}
+.elcard .ec-t{font-size:12.8px;font-weight:650;margin:3px 0 5px}
+.elcard .ec-d{font-size:11.3px;color:var(--ink3);line-height:1.65}
+.elcard .ec-score{position:absolute;right:11px;top:11px;font-family:var(--mono);font-size:12px;font-weight:700}
+.dcp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.dcp-opt{border:1.5px solid var(--line2);border-radius:12px;padding:13px 14px;cursor:pointer;transition:.16s;background:var(--panel)}
+.dcp-opt:hover{border-color:var(--brand);transform:translateY(-1px)}
+.dcp-opt.sel{border-color:var(--brand);background:var(--brand-bg);box-shadow:var(--glow)}
+.dcp-opt.sel.no{border-color:var(--bad);background:var(--bad-bg);box-shadow:none}
+.dcp-opt.sel.hold{border-color:var(--gold);background:var(--gold-bg);box-shadow:none}
+.dcp-opt .do-t{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
+.dcp-opt .do-d{font-size:11px;color:var(--ink3);margin-top:4px;line-height:1.6}
+.gate-rail{display:flex;gap:0;overflow-x:auto;padding:2px 0}
+.gate{flex:1;min-width:132px;border-left:2px solid var(--line2);padding:0 12px 0 13px;position:relative}
+.gate:first-child{border-left-color:transparent}
+.gate.g-inv{border-left-color:var(--brand)}
+.gate.g-tech{border-left-color:var(--gold)}
+.gate.g-peer{border-left-color:var(--ok)}
+.gate .g-k{font-size:10px;font-family:var(--mono);color:var(--ink3);letter-spacing:.8px}
+.gate .g-t{font-size:12.5px;font-weight:660;margin:2px 0 4px}
+.gate .g-d{font-size:11px;color:var(--ink3);line-height:1.6}
+.matrix-scroll{overflow-x:auto}
+table.mx{border-collapse:separate;border-spacing:3px;font-size:11px}
+table.mx th{font-size:10px;color:var(--ink3);font-weight:600;padding:4px 7px;white-space:nowrap}
+table.mx td{width:34px;height:32px;border-radius:7px;background:var(--panel2);text-align:center;vertical-align:middle;font-family:var(--mono);font-size:11px;border:1px solid var(--line)}
+.mx-l1{background:var(--ok-bg)!important;border-color:rgba(18,196,139,.3)!important;color:var(--ok)}
+.mx-l2{background:var(--brand-bg)!important;border-color:rgba(79,108,255,.3)!important;color:var(--brand)}
+.mx-l3{background:var(--gold-bg)!important;border-color:rgba(240,185,11,.32)!important;color:var(--gold)}
+.mx-l4{background:var(--bad-bg)!important;border-color:rgba(242,69,95,.3)!important;color:var(--bad)}
+.mx-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--ink3);margin-top:9px}
+.mx-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+table.trace{border-collapse:collapse;font-size:11.5px;width:100%}
+table.trace th,table.trace td{border:1px solid var(--line);padding:5px 8px;text-align:center}
+table.trace th{background:var(--panel2);font-size:10.5px;color:var(--ink3);font-weight:600}
+table.trace td.lb{text-align:left;background:var(--panel2);font-weight:550;white-space:nowrap}
+.lk{display:inline-block;width:15px;height:15px;border-radius:4px;line-height:15px;font-size:9px;text-align:center}
+.lk.y{background:var(--ok-bg);color:var(--ok);border:1px solid rgba(18,196,139,.35)}
+.lk.p{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(240,185,11,.35)}
+.lk.n{background:var(--bad-bg);color:var(--bad);border:1px solid rgba(242,69,95,.3)}
+.lk.d{background:var(--panel2);color:var(--ink3);border:1px dashed var(--line2)}
+.gantt{font-size:11.5px}
+.gantt-row{display:grid;grid-template-columns:190px 1fr;align-items:center;gap:10px;padding:4px 0;border-bottom:1px dashed var(--line)}
+.gantt-row:last-child{border-bottom:none}
+.gantt-lb{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink2)}
+.gantt-track{position:relative;height:20px;background:var(--panel2);border-radius:5px;overflow:hidden;background-image:repeating-linear-gradient(90deg,transparent,transparent calc(25% - 1px),var(--line) calc(25% - 1px),var(--line) 25%)}
+.gantt-bar{position:absolute;top:3px;height:14px;border-radius:4px;background:linear-gradient(90deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:9.5px;color:#fff;font-family:var(--mono);overflow:hidden}
+.gantt-bar.ok{background:var(--ok)}
+.gantt-bar.gold{background:var(--gold);color:#1a1200}
+.gantt-bar.bad{background:var(--bad)}
+.gantt-bar.ms{background:var(--ink3)}
+.funnel{display:flex;flex-direction:column;gap:7px}
+.fn-row{display:flex;align-items:center;gap:11px}
+.fn-lb{width:104px;flex:0 0 104px;font-size:11.5px;color:var(--ink2);text-align:right}
+.fn-bar{height:26px;border-radius:6px;background:linear-gradient(90deg,var(--brand),var(--brand2));display:flex;align-items:center;padding:0 10px;color:#fff;font-size:11px;font-family:var(--mono);min-width:46px;transition:width .5s}
+.fn-note{font-size:11px;color:var(--ink3);white-space:nowrap}
+.score-row{display:grid;grid-template-columns:104px 1fr 44px;gap:9px;align-items:center;padding:5px 0}
+.score-lb{font-size:11.5px;color:var(--ink2)}
+.score-bar{height:7px;border-radius:4px;background:var(--panel2);overflow:hidden}
+.score-bar i{display:block;height:100%;border-radius:4px}
+.score-v{font-family:var(--mono);font-size:11.5px;text-align:right}
+.perm-row{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:12.2px}
+.perm-row:last-child{border-bottom:none}
+.perm-row .p-n{flex:1}
+pre.code{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-family:var(--mono);font-size:11.3px;line-height:1.75;overflow-x:auto;color:var(--ink2)}
+pre.code b{color:var(--brand);font-weight:600}
+pre.code i{color:var(--ok);font-style:normal}
+pre.code u{color:var(--gold);text-decoration:none}
+.diff{border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:11.8px}
+.diff .d-h{padding:7px 12px;background:var(--panel2);font-size:11px;color:var(--ink3);border-bottom:1px solid var(--line)}
+.diff .d-add{padding:6px 12px;background:var(--ok-bg);border-bottom:1px dashed var(--line)}
+.diff .d-del{padding:6px 12px;background:var(--bad-bg)}
+.diff .mono{font-family:var(--mono);font-size:10.5px;color:var(--ink3)}
+.doc-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12.2px}
+.doc-item:last-child{border-bottom:none}
+.doc-item .di-ic{width:26px;height:26px;flex:0 0 26px;border-radius:7px;background:var(--panel2);display:grid;place-items:center;font-size:12px;border:1px solid var(--line)}
+.empty{padding:46px 20px;text-align:center;color:var(--ink3);font-size:12.5px}
+.empty .em-i{font-size:28px;opacity:.45;display:block;margin-bottom:8px}
+.wcard{border:1px solid var(--line);border-radius:11px;padding:12px 13px;background:var(--panel2)}
+.wcard .w-t{font-size:11px;color:var(--ink3);letter-spacing:.5px}
+.wcard .w-v{font-size:21px;font-weight:750;font-family:var(--mono);margin-top:3px}
+.rings{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.pop-note{font-size:11px;color:var(--ink3);line-height:1.65}
+
+/* 弹窗表单体系 */
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:0 15px}
+.mrow.c1{grid-template-columns:1fr}
+.mrow.c3{grid-template-columns:1fr 1fr 1fr}
+.mrow.c4{grid-template-columns:1fr 1fr 1fr 1fr}
+.mrow .span2{grid-column:span 2}
+.mrow .span3{grid-column:span 3}
+.mrow .span4{grid-column:span 4}
+.fs-title{font-size:10.6px;font-weight:700;letter-spacing:1px;color:var(--ink3);text-transform:uppercase;margin:4px 0 11px;display:flex;align-items:center;gap:9px}
+.fs-title:after{content:"";flex:1;height:1px;background:var(--line)}
+.fs-title:first-child{margin-top:0}
+.chklist{display:flex;flex-direction:column;gap:7px}
+.chklist.c2{display:grid;grid-template-columns:1fr 1fr}
+.ci{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line2);border-radius:10px;cursor:pointer;transition:.15s;background:var(--panel2);user-select:none}
+.ci:hover{border-color:var(--brand);transform:translateX(2px)}
+.ci.on{border-color:var(--brand);background:var(--brand-bg)}
+.ci.on.ok{border-color:var(--ok);background:var(--ok-bg)}
+.ci.on.warn{border-color:var(--ok);background:var(--gold-bg)}
+.ci.on.bad{border-color:var(--bad);background:var(--bad-bg)}
+.ci .cbox{width:16px;height:16px;border-radius:5px;border:1.5px solid var(--line2);flex:0 0 16px;margin-top:1px;position:relative;transition:.15s;background:var(--panel)}
+.ci.on .cbox{background:var(--brand);border-color:var(--brand)}
+.ci.on.ok .cbox{background:var(--ok);border-color:var(--ok)}
+.ci.on.warn .cbox{background:var(--gold);border-color:var(--gold)}
+.ci.on.bad .cbox{background:var(--bad);border-color:var(--bad)}
+.ci.on .cbox:after{content:"✓";position:absolute;left:2.6px;top:-4px;color:#fff;font-size:12.5px;font-weight:800;line-height:1.4}
+.ci .ct{font-size:12.2px;line-height:1.6;font-weight:560}
+.ci .cd{font-size:10.8px;color:var(--ink3);margin-top:3px;line-height:1.6}
+.ci .cmeta{margin-left:auto;flex:0 0 auto;padding-left:10px}
+.rcards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.rcards.c2{grid-template-columns:1fr 1fr}
+.rcards.c4{grid-template-columns:repeat(4,1fr)}
+.rc{padding:11px 13px;border:1px solid var(--line2);border-radius:11px;cursor:pointer;transition:.16s;background:var(--panel2);text-align:left}
+.rc:hover{border-color:var(--brand);transform:translateY(-1px)}
+.rc.on{border-color:var(--brand);background:var(--brand-bg);box-shadow:var(--glow)}
+.rc.on.ok{border-color:var(--ok);background:var(--ok-bg);box-shadow:none}
+.rc.on.warn{border-color:var(--gold);background:var(--gold-bg);box-shadow:none}
+.rc.on.bad{border-color:var(--bad);background:var(--bad-bg);box-shadow:none}
+.rc .rt{font-size:12.4px;font-weight:650;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.rc .rd{font-size:10.8px;color:var(--ink2);line-height:1.6}
+.tag-pick{display:flex;gap:6px;flex-wrap:wrap}
+.tpk{padding:4.5px 11px;border-radius:20px;border:1px solid var(--line2);background:var(--panel2);font-size:11.4px;cursor:pointer;transition:.15s;color:var(--ink2);user-select:none}
+.tpk:hover{border-color:var(--brand);color:var(--brand)}
+.tpk.on{background:var(--brand-bg);border-color:var(--brand);color:var(--brand);font-weight:640}
+.seg{display:inline-flex;background:var(--panel2);border:1px solid var(--line2);border-radius:9px;padding:2px;gap:2px}
+.seg i{padding:5px 13px;font-size:11.8px;border-radius:7px;cursor:pointer;font-style:normal;transition:.15s;color:var(--ink2);user-select:none;white-space:nowrap}
+.seg i:hover{color:var(--ink)}
+.seg i.on{background:var(--elev);color:var(--brand);font-weight:640;box-shadow:0 1px 5px rgba(0,0,0,.18)}
+.pv{background:var(--panel2);border:1px solid var(--line2);border-radius:11px;padding:11px 14px;font-size:12px;line-height:1.7}
+.pv .pv-r{display:flex;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.pv .pv-r:last-child{border-bottom:none}
+.pv .pv-k{flex:0 0 108px;color:var(--ink3);font-size:11.4px}
+.pv .pv-v{flex:1;color:var(--ink);word-break:break-word}
+.big-metric{display:flex;gap:11px;flex-wrap:wrap}
+.big-metric .bm{flex:1;min-width:112px;background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:10px 13px;transition:.15s}
+.big-metric .bm:hover{border-color:var(--brand)}
+.big-metric .bm .lb{font-size:10.4px;color:var(--ink3);letter-spacing:.3px}
+.big-metric .bm .v{font-family:var(--mono);font-size:17.5px;font-weight:700;margin-top:4px;letter-spacing:-.4px}
+.range-row{display:flex;align-items:center;gap:13px;padding:8px 0}
+.range-row .rl{flex:0 0 108px;font-size:12px;color:var(--ink2)}
+.range-row input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:3px;background:var(--line2);outline:none;cursor:pointer}
+.range-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));cursor:pointer;box-shadow:0 0 0 3px var(--brand-bg)}
+.range-row .rv{flex:0 0 84px;text-align:right;font-family:var(--mono);font-size:12.6px;font-weight:660;color:var(--brand)}
+.wz{display:flex;align-items:center;margin-bottom:17px}
+.wzi{display:flex;align-items:center;gap:7px;font-size:11.4px;color:var(--ink3);white-space:nowrap}
+.wzi .wn{width:21px;height:21px;border-radius:50%;background:var(--panel2);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:10.4px;font-weight:700;flex:0 0 21px}
+.wzi.on{color:var(--brand);font-weight:620}
+.wzi.on .wn{background:var(--brand);border-color:var(--brand);color:#fff}
+.wzi.done .wn{background:var(--ok);border-color:var(--ok);color:#fff}
+.wz-l{flex:1;height:1.5px;background:var(--line2);margin:0 7px;min-width:12px}
+.wz-l.done{background:var(--ok)}
+.mnote{border-radius:10px;padding:10px 13px;font-size:11.8px;line-height:1.7;margin:12px 0;border:1px solid;display:flex;gap:9px}
+.mnote.b{background:var(--brand-bg);border-color:rgba(79,108,255,.25)}
+.mnote.g{background:var(--ok-bg);border-color:rgba(18,196,139,.25)}
+.mnote.y{background:var(--gold-bg);border-color:rgba(240,185,11,.3)}
+.mnote.r{background:var(--bad-bg);border-color:rgba(242,69,95,.3)}
+.mnote .mi{flex:0 0 15px;font-size:13px}
+.mtabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:15px;flex-wrap:wrap}
+.mtab{padding:7px 13px;font-size:12.2px;color:var(--ink2);cursor:pointer;border-bottom:2px solid transparent;transition:.15s;user-select:none;white-space:nowrap}
+.mtab:hover{color:var(--ink)}
+.mtab.on{color:var(--brand);border-bottom-color:var(--brand);font-weight:640}
+.pgrp{display:flex;flex-direction:column;gap:11px}
+.pgrp .pr{display:flex;align-items:center;gap:11px}
+.pgrp .pr .pl{flex:0 0 128px;font-size:11.8px;color:var(--ink2)}
+.pgrp .pr .pb{flex:1}
+.pgrp .pr .pn{flex:0 0 52px;text-align:right;font-family:var(--mono);font-size:11.6px;color:var(--ink2)}
+.btn{position:relative;overflow:hidden}
+.btn:active{transform:translateY(1px) scale(.985)}
+.kpi,.elcard,.wcard{transition:transform .16s,border-color .16s,box-shadow .16s}
+.kpi:hover,.elcard:hover{transform:translateY(-2px)}
+.hl-row{background:var(--brand-bg)!important}
+.hl-row td{background:transparent!important}
+@keyframes shk{0%,100%{transform:translateX(0)}18%{transform:translateX(-6px)}36%{transform:translateX(5px)}54%{transform:translateX(-3px)}72%{transform:translateX(2px)}}
+.shake{animation:shk .4s}
+.needfix{border-color:var(--bad)!important;box-shadow:0 0 0 3px var(--bad-bg)}
+@keyframes rip{0%{transform:scale(.3);opacity:.5}100%{transform:scale(2.4);opacity:0}}
+.rip{position:absolute;border-radius:50%;background:currentColor;pointer-events:none;animation:rip .5s ease-out;opacity:0}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.modal-b .fade{animation:fadeUp .26s}
+.drawer-b .mrow{grid-template-columns:1fr 1fr}
+
+/* ── 领域元件：会话工作台 ── */
+.im-row{display:flex;gap:10px;padding:11px 13px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .12s}
+.im-row:hover{background:var(--panel2)}
+.im-row.on{background:var(--brand-bg)}
+.im-av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700;flex:0 0 32px}
+.im-main{flex:1;min-width:0}
+.im-t{font-size:12.6px;font-weight:620;display:flex;align-items:center;gap:7px}
+.im-t .im-n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.im-p{font-size:11.3px;color:var(--ink3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.im-m{font-size:10.2px;color:var(--ink3);font-family:var(--mono);flex:0 0 auto;align-self:flex-start}
+.bubble{max-width:74%;padding:9px 13px;border-radius:12px;font-size:12.4px;line-height:1.75;margin-bottom:9px}
+.bubble.bot{background:var(--panel2);border:1px solid var(--line);border-radius:12px 12px 12px 3px}
+.bubble.me{background:var(--brand-bg);border:1px solid rgba(79,108,255,.25);margin-left:auto;border-radius:12px 12px 3px 12px}
+.bubble .b-t{font-size:10px;color:var(--ink3);margin-bottom:4px;display:flex;gap:7px;align-items:center}
+.chan-dot{width:18px;height:18px;border-radius:6px;display:inline-grid;place-items:center;font-size:10px;flex:0 0 18px}
+
+/* ── 领域元件：素材卡 / 广告卡 ── */
+.tile{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--panel2);cursor:pointer;transition:.16s}
+.tile:hover{border-color:var(--brand);transform:translateY(-2px);box-shadow:var(--shadow)}
+.tile .th{height:96px;display:grid;place-items:center;font-size:30px;border-bottom:1px solid var(--line);position:relative}
+.tile .tb{padding:9px 11px}
+.tile .tb .t1{font-size:12px;font-weight:620;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile .tb .t2{font-size:10.6px;color:var(--ink3);margin-top:3px;display:flex;justify-content:space-between;gap:6px}
+.tile.sel{border-color:var(--brand);box-shadow:var(--glow)}
+
+/* ── 领域元件：对话轮次 / 意图命中 ── */
+.intent-hit{display:flex;align-items:center;gap:9px;padding:8px 11px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);font-size:12px}
+.intent-hit .ih-n{font-weight:620}
+.intent-hit .ih-c{margin-left:auto;font-family:var(--mono);font-size:11.5px}
+
+/* ── 领域元件：KPI 口径气泡 ── */
+[data-tip]{position:relative;cursor:help;border-bottom:1px dashed var(--ink3)}
+.tipbox{position:absolute;bottom:130%;left:50%;transform:translateX(-50%);width:250px;background:var(--elev);border:1px solid var(--line2);border-radius:10px;padding:9px 12px;font-size:11px;color:var(--ink2);line-height:1.7;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.16s;z-index:70;white-space:normal;font-weight:400;letter-spacing:0}
+[data-tip]:hover .tipbox{opacity:1;bottom:calc(100% + 6px)}
+
+@media (max-width:1560px){.top-search{width:190px}}
+@media (max-width:1420px){.top-search .ph{display:none}.top-search{width:auto}}
+@media (max-width:1440px){.top-search kbd{display:none}}
+@media (max-width:1330px){.topbar{gap:8px;padding:0 12px}.tn-item{padding:7px 8px;font-size:12px;gap:4px}.tn-item.on:after{left:8px;right:8px}}
+@media (max-width:1260px){.tn-item{padding:7px 7px;font-size:11.5px}.side{width:210px;flex:0 0 210px}.grid5{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:1160px){.tn-item .tn-badge{display:none}.tn-item{padding:7px 6px;font-size:11px}}
+@media (max-width:1100px){.grid4{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr 1fr}.dcp-grid{grid-template-columns:1fr 1fr}.g13,.g31{grid-template-columns:1fr}}
+@media (max-width:960px){.grid2{grid-template-columns:1fr}.sub-right .cb-env{display:none}}
+
+</style>
+</head>
+<body>
+<div class="login-mask" id="loginMask">
+  <div class="login-card">
+    <div class="login-brand">
+      <span class="brand-mark lg">AP</span>
+      <div><b>自动化广告投放个人中心管理平台</b><em>我的投放 · 我的告警 · 我的调价建议 · 我的绩效</em></div>
+    </div>
+    <div class="login-note">
+      <span class="dot ok"></span>企业 SSO 已连接 · 敏感操作需二次确认
+    </div>
+    <div class="sso-grid">
+      <div class="sso" data-act="login">🔐 统一身份认证（SSO）</div>
+      <div class="sso" data-act="login">🪪 硬件密钥 FIDO2</div>
+    </div>
+    <div class="fld"><label>员工账号</label><input class="inp" value="suxiaotong@pers.demo.local" readonly></div>
+    <div class="fld"><label>动态口令（Authenticator）</label><input class="inp mono" value="418 206" readonly></div>
+    <div class="login-hint small muted">强制 2FA · 敏感操作二次确认 · 全部登录尝试写入审计</div>
+    <button class="btn p lg" style="width:100%;margin-top:14px" data-act="do-login">安全登录 →</button>
+    <div class="login-foot small muted">演示原型 · 数据为构造样例，不代表真实业务指标</div>
+  </div>
+</div>
+
+<div class="wb" id="wb">
+  <aside class="side" id="side">
+    <div class="side-brand">
+      <span class="brand-mark">AP</span>
+      <div class="sb-txt"><b>投放个人中心</b><em>My Ads Workspace</em></div>
+    </div>
+    <nav class="side-nav" id="sideNav"></nav>
+    <div class="side-foot">
+      <div class="env-chip"><i></i><span class="sb-txt">生产环境 · 演示数据</span></div>
+      <div class="side-user"><span class="uav">苏</span><div class="sb-txt"><b>苏晓桐</b><em>优化师 · Meta & TikTok</em></div></div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <button class="tb-icon" data-act="fold" title="折叠侧栏">☰</button>
+      <nav class="topnav" id="topNav"></nav>
+      <div class="top-search" id="topSearch" data-act="palette">
+        <span>🔍</span><span class="ph">搜索我的活动 / 素材 / 告警…</span><kbd>⌘K</kbd>
+      </div>
+      <div class="top-acts">
+        <span class="bell-wrap" id="bellWrap">
+          <button class="tb-icon" data-act="bell" title="通知中心">🔔<i class="bell-badge" id="bellBadge"></i></button>
+          <div class="bell-panel" id="bellPanel"></div>
+        </span>
+        <button class="tb-icon" id="ruleBtn" data-act="rule-toggle" title="业务规则标注">⚑</button>
+        <button class="tb-icon" data-act="ai" title="AI 助手">✦</button>
+        <button class="tb-icon" data-act="theme" title="深浅主题">◐</button>
+      </div>
+    </header>
+    <div class="subbar">
+      <div class="crumb" id="crumb"></div>
+      <div class="sub-sp"></div>
+      <div class="sub-right" id="subRight"></div>
+    </div>
+    <main class="content" id="content"></main>
+  </div>
+</div>
+
+<div class="drawer-mask" data-dmask></div>
+<aside class="drawer" id="drawer"></aside>
+<div class="modal-mask" data-mmask></div>
+<div class="modal" id="modal"></div>
+<div class="pal-mask" data-pmask></div>
+<div class="palette" id="palette">
+  <input class="pal-in" id="palInput" placeholder="搜索页面 / 对象 / 动作…（↑↓ 选择 · Enter 跳转）">
+  <div class="pal-list" id="palList"></div>
+</div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+
+/* ============================================================
+   1. 工具
+   ============================================================ */
+const $=(s,r)=>(r||document).querySelector(s);
+const $$=(s,r)=>[...(r||document).querySelectorAll(s)];
+function cssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function TC(){return {brand:cssVar('--brand'),brand2:cssVar('--brand2'),ink:cssVar('--ink'),ink2:cssVar('--ink2'),ink3:cssVar('--ink3'),line:cssVar('--line'),line2:cssVar('--line2'),ok:cssVar('--ok'),bad:cssVar('--bad'),gold:cssVar('--gold'),panel:cssVar('--panel'),panel2:cssVar('--panel2'),elev:cssVar('--elev')}}
+function setupCanvas(cv,h){
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  const w=Math.max(120,(cv.parentElement? cv.parentElement.clientWidth:0)-1)||600;
+  const hh=h||+cv.dataset.h||160;
+  cv.width=Math.round(w*dpr); cv.height=Math.round(hh*dpr);
+  cv.style.width='100%'; cv.style.height=hh+'px';
+  const x=cv.getContext('2d'); x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,w,hh);
+  return {x,w,h:hh,C:TC()};
+}
+const FF=()=>getComputedStyle(document.body).fontFamily;
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0)}
+function prng(seed){let a=hash(String(seed));return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hexA(hex,a){const c=String(hex).replace('#','');const n=c.length===3?c.split('').map(x=>x+x).join(''):c;const r=parseInt(n.slice(0,2),16),g=parseInt(n.slice(2,4),16),b=parseInt(n.slice(4,6),16);return 'rgba('+r+','+g+','+b+','+a+')'}
+function rr(x,a,b,w,h,r){r=Math.min(r,h/2,w/2);x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()}
+function catmull(pts){if(pts.length<3)return pts.map(p=>[p.x,p.y]);const d=[pts[0]];for(let i=0;i<pts.length-1;i++){const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;for(let t=1;t<=8;t++){const s=t/8,s2=s*s,s3=s2*s;d.push({x:0.5*((2*p1.x)+(-p0.x+p2.x)*s+(2*p0.x-5*p1.x+4*p2.x-p3.x)*s2+(-p0.x+3*p1.x-3*p2.x+p3.x)*s3),y:0.5*((2*p1.y)+(-p0.y+p2.y)*s+(2*p0.y-5*p1.y+4*p2.y-p3.y)*s2+(-p0.y+3*p1.y-3*p2.y+p3.y)*s3)})}}return d.map(p=>[p.x,p.y])}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function nowTime(){const d=new Date();const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getMonth()+1)+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}
+function ymd(){const d=new Date();const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())}
+function trunc(s,n){s=String(s==null?'':s);return s.length>n?s.slice(0,n)+'…':s}
+function yuan(v){return '¥'+Number(v).toLocaleString('zh-CN')}
+function wan(v){return (v/10000).toFixed(1)+'万'}
+
+/* ============================================================
+   2. AC —— Canvas 2D 图表引擎
+   ============================================================ */
+const AC={};
+AC.series=(seed,n,base,amp,trend)=>{const r=prng(seed);const a=[];let v=base;for(let i=0;i<n;i++){v+=(r()-.48)*amp+(trend||0);a.push(Math.max(1,v))}return a};
+AC.grid=(x,x1,x2,y1,y2,C,rows,tc)=>{x.strokeStyle=C.line;x.lineWidth=1;x.font='10px '+FF();x.fillStyle=C.ink3;for(let i=0;i<=rows;i++){const y=y1+(y2-y1)*i/rows;x.beginPath();x.moveTo(x1,Math.round(y)+.5);x.lineTo(x2,Math.round(y)+.5);x.stroke();x.textAlign='right';x.textBaseline='middle';x.fillText(tc?tc(i):(''+Math.round(100-100*i/rows)),x1-7,y)}};
+AC.spark=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||26);const up=cv.dataset.up==='1';const s=AC.series(cv.dataset.seed||'s',22,50,14,up?1.1:-.4);const mn=Math.min.apply(null,s),mx=Math.max.apply(null,s);const X=i=>2+(w-4)*i/(s.length-1),Y=v=>h-3-((v-mn)/(mx-mn||1))*(h-7);const col=up?C.ok:C.bad;const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,hexA(col,.30));g.addColorStop(1,hexA(col,0));const p=catmull(s.map((v,i)=>({x:X(i),y:Y(v)})));x.beginPath();p.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.lineTo(X(s.length-1),h);x.lineTo(X(0),h);x.closePath();x.fillStyle=g;x.fill();x.beginPath();p.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.strokeStyle=col;x.lineWidth=1.5;x.stroke()};
+AC.ring=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||44);const p=+(cv.dataset.p||60);const col=cv.dataset.color||C.brand;const cx=w/2,cy=h/2,r=Math.min(w,h)/2-4;x.lineWidth=4;x.strokeStyle=C.line2;x.beginPath();x.arc(cx,cy,r,0,Math.PI*2);x.stroke();x.strokeStyle=col;x.lineCap='round';x.beginPath();x.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*p/100);x.stroke();x.fillStyle=C.ink;x.font='600 11px '+FF();x.textAlign='center';x.textBaseline='middle';x.fillText(p+'%',cx,cy+.5)};
+AC.area=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||170);const s=AC.series(cv.dataset.seed||'a',26,52,16,+cv.dataset.trend||1.0);const L=34,R=8,T=12,B=20;AC.grid(x,L,w-R,T,h-B,C,4,v=>v);const mn=Math.min.apply(null,s)*.9,mx=Math.max.apply(null,s)*1.06;const X=i=>L+(w-L-R)*i/(s.length-1),Y=v=>h-B-((v-mn)/(mx-mn))*(h-B-T);const p=catmull(s.map((v,i)=>({x:X(i),y:Y(v)})));const col=cv.dataset.color||C.brand;const g=x.createLinearGradient(0,T,0,h-B);g.addColorStop(0,hexA(col,.34));g.addColorStop(1,hexA(col,0));x.beginPath();p.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.lineTo(X(s.length-1),h-B);x.lineTo(X(0),h-B);x.closePath();x.fillStyle=g;x.fill();x.beginPath();p.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.strokeStyle=col;x.lineWidth=2;x.stroke();x.beginPath();x.arc(X(s.length-1),Y(s[s.length-1]),3.4,0,7);x.fillStyle=col;x.fill();x.strokeStyle=C.elev;x.lineWidth=1.6;x.stroke()};
+AC.line=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||180);const n=+cv.dataset.n||26;const sets=JSON.parse(cv.dataset.sets||'null')||[{seed:'l1',c:C.brand,t:.8},{seed:'l2',c:C.gold,t:-.2},{seed:'l3',c:C.ok,t:.3}];const all=sets.map(s=>AC.series(s.seed,n,45,16,s.t));const flat=[].concat.apply([],all);const mn=Math.min.apply(null,flat)*.86,mx=Math.max.apply(null,flat)*1.08;const L=34,R=8,T=12,B=20;AC.grid(x,L,w-R,T,h-B,C,4,v=>v);const X=i=>L+(w-L-R)*i/(n-1),Y=v=>h-B-((v-mn)/(mx-mn))*(h-B-T);all.forEach((s,si)=>{const p=catmull(s.map((v,i)=>({x:X(i),y:Y(v)})));x.beginPath();p.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.strokeStyle=sets[si].c;x.lineWidth=2;x.stroke();x.beginPath();x.arc(X(n-1),Y(s[n-1]),3,0,7);x.fillStyle=sets[si].c;x.fill()})};
+AC.dual=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||180);const n=24;const a=AC.series(cv.dataset.seed+'A',n,42,15,.6),b=AC.series(cv.dataset.seed+'B',n,30,11,.15);const mn=Math.min.apply(null,a.concat(b))*.85,mx=Math.max.apply(null,a.concat(b))*1.1;const L=34,R=8,T=12,B=22;AC.grid(x,L,w-R,T,h-B,C,4,v=>v);const X=i=>L+(w-L-R)*i/(n-1),Y=v=>h-B-((v-mn)/(mx-mn))*(h-B-T);[[a,C.brand],[b,C.gold]].forEach(function(pair){const s=pair[0],col=pair[1];const p=s.map((v,i)=>({x:X(i),y:Y(v)}));x.beginPath();p.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.strokeStyle=hexA(col,.3);x.lineWidth=5;x.lineJoin='round';x.stroke();x.beginPath();p.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.strokeStyle=col;x.lineWidth=2;x.stroke();p.filter((_,i)=>i%6===0).forEach(q=>{x.beginPath();x.arc(q.x,q.y,2.6,0,7);x.fillStyle=col;x.fill()})})};
+AC.bars=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||170);const n=+cv.dataset.n||16;const s=AC.series(cv.dataset.seed||'b',n,48,20,0);const mx=Math.max.apply(null,s)*1.12;const L=34,R=8,T=12,B=20;AC.grid(x,L,w-R,T,h-B,C,4,v=>v);const bw=(w-L-R)/n*.62;const g=x.createLinearGradient(0,T,0,h-B);g.addColorStop(0,C.brand);g.addColorStop(1,hexA(C.brand2,.55));s.forEach((v,i)=>{const cx=L+((w-L-R)/n)*(i+.5);const bh=(h-B-T)*(v/mx);const y=h-B-bh;rr(x,cx-bw/2,y,bw,bh,3);x.fillStyle=(cv.dataset.hl&&i===+cv.dataset.hl)?C.gold:g;x.fill()})};
+AC.stacked=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||180);const n=8;const cols=[C.brand,C.brand2,C.gold,C.ok,C.bad];const sets=cols.map((c,i)=>AC.series(cv.dataset.seed+'st'+i,n,20+i*3,7,0));const tot=[];for(let i=0;i<n;i++)tot.push(sets.reduce((a,s)=>a+s[i],0));const mx=Math.max.apply(null,tot)*1.1;const L=40,R=8,T=12,B=22;AC.grid(x,L,w-R,T,h-B,C,4,v=>Math.round(mx*v/100/10)*10);const bw=(w-L-R)/n*.56;sets.forEach((s,si)=>{s.forEach((v,i)=>{const below=sets.slice(0,si).reduce((a,q)=>a+q[i],0);const y0=h-B-(h-B-T)*((below+v)/mx),y1=h-B-(h-B-T)*(below/mx);const cx=L+((w-L-R)/n)*(i+.5);const bh=Math.max(1,y1-y0-1);x.fillStyle=cols[si];rr(x,cx-bw/2,y0,bw,bh,2);x.fill()})})};
+AC.hbars=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||180);const rows=JSON.parse(cv.dataset.data||'null');if(!rows)return;const L=Math.min(150,w*.36),R=64,T=8,B=8;const mx=Math.max.apply(null,rows.map(r=>r[1]));const rh=(h-T-B)/rows.length;rows.forEach((r,i)=>{const y=T+i*rh+rh/2;const bw=Math.max(3,(w-L-R)*(r[1]/mx));const col=r[2]||(r[1]>110?C.bad:(r[1]>100?C.gold:C.ok));x.fillStyle=C.panel2;rr(x,L,y-6,w-L-R,12,6);x.fill();const g=x.createLinearGradient(L,0,L+bw,0);g.addColorStop(0,hexA(col,.6));g.addColorStop(1,col);x.fillStyle=g;rr(x,L,y-6,bw,12,6);x.fill();x.fillStyle=C.ink2;x.font='11px '+FF();x.textAlign='right';x.textBaseline='middle';x.fillText(r[0],L-9,y);x.fillStyle=col;x.font='600 11px '+FF();x.textAlign='left';x.fillText(r[1]+(r[3]||''),Math.min(L+bw+8,w-R+40),y)})};
+AC.donut=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||160);const data=JSON.parse(cv.dataset.data||'[{"v":58},{"v":26},{"v":16}]');const cols=(cv.dataset.colors||[C.brand,C.brand2,C.gold,C.ok,C.bad,C.ink3].join(',')).split(',');const tot=data.reduce((a,d)=>a+d.v,0);const cx=w/2,cy=h/2,R=Math.min(w,h)/2-6,r=R*.62;let ang=-Math.PI/2;data.forEach((d,i)=>{const a2=ang+Math.PI*2*d.v/tot;x.beginPath();x.arc(cx,cy,R,ang,a2);x.arc(cx,cy,r,a2,ang,true);x.closePath();x.fillStyle=cols[i%cols.length];x.fill();x.strokeStyle=C.panel;x.lineWidth=2;x.stroke();ang=a2});x.fillStyle=C.ink;x.textAlign='center';x.textBaseline='alphabetic';x.font='700 19px '+FF();x.fillText(cv.dataset.center||'',cx,cy+(cv.dataset.sub?2:8));if(cv.dataset.sub){x.fillStyle=C.ink3;x.font='10px '+FF();x.fillText(cv.dataset.sub,cx,cy+18)}};
+AC.radar=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||200);const axes=JSON.parse(cv.dataset.axes||'["A","B","C","D","E","F"]');const A=JSON.parse(cv.dataset.a||'[82,64,76,58,88,71]');const Bs=JSON.parse(cv.dataset.b||'[70,72,68,74,62,80]');const cx=w/2,cy=h/2+4,R=Math.min(w,h)/2-26,n=axes.length;for(let k=1;k<=4;k++){x.beginPath();for(let i=0;i<n;i++){const a=-Math.PI/2+Math.PI*2*i/n;const px=cx+Math.cos(a)*R*k/4,py=cy+Math.sin(a)*R*k/4;i?x.lineTo(px,py):x.moveTo(px,py)}x.closePath();x.strokeStyle=k===4?C.line2:C.line;x.lineWidth=1;x.stroke()}axes.forEach((t,i)=>{const a=-Math.PI/2+Math.PI*2*i/n;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R);x.strokeStyle=C.line;x.stroke();x.fillStyle=C.ink3;x.font='10.5px '+FF();x.textAlign=Math.abs(Math.cos(a))<.3?'center':(Math.cos(a)>0?'left':'right');x.textBaseline=Math.abs(Math.sin(a))<.3?'middle':(Math.sin(a)>0?'top':'bottom');x.fillText(t,cx+Math.cos(a)*(R+9),cy+Math.sin(a)*(R+8))});[[A,C.brand],[Bs,C.gold]].forEach(function(pair){const arr=pair[0],col=pair[1];x.beginPath();arr.forEach((v,i)=>{const a=-Math.PI/2+Math.PI*2*i/n;const px=cx+Math.cos(a)*R*v/100,py=cy+Math.sin(a)*R*v/100;i?x.lineTo(px,py):x.moveTo(px,py)});x.closePath();x.fillStyle=hexA(col,.16);x.fill();x.strokeStyle=col;x.lineWidth=2;x.stroke();arr.forEach((v,i)=>{const a=-Math.PI/2+Math.PI*2*i/n;x.beginPath();x.arc(cx+Math.cos(a)*R*v/100,cy+Math.sin(a)*R*v/100,2.6,0,7);x.fillStyle=col;x.fill()})})};
+AC.gauge=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||140);const v=+(cv.dataset.v||64),mx=+(cv.dataset.max||100);const cx=w/2,cy=h*.76,R=Math.min(w/2-14,h*.62);x.lineWidth=13;x.lineCap='round';x.strokeStyle=C.line2;x.beginPath();x.arc(cx,cy,R,Math.PI,Math.PI*2);x.stroke();const col=v>=mx*.8?C.ok:(v>=mx*.55?C.brand:C.bad);const g=x.createLinearGradient(cx-R,0,cx+R,0);g.addColorStop(0,C.brand);g.addColorStop(1,col);x.strokeStyle=g;x.beginPath();x.arc(cx,cy,R,Math.PI,Math.PI+Math.PI*Math.min(1,v/mx));x.stroke();x.fillStyle=C.ink;x.textAlign='center';x.font='700 23px '+FF();x.fillText(cv.dataset.label||v+'%',cx,cy-2);x.fillStyle=C.ink3;x.font='10.5px '+FF();x.fillText(cv.dataset.sub||'',cx,cy+16)};
+AC.scatter=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||250);const d=JSON.parse(cv.dataset.data||'[]');const L=46,R=18,T=18,B=32;x.strokeStyle=C.line;x.strokeRect(L,T,w-L-R,h-T-B);x.fillStyle=C.ink3;x.font='10px '+FF();x.textAlign='center';x.textBaseline='top';for(let i=0;i<=4;i++){x.fillText(i*25,L+(w-L-R)*i/4,h-14)}x.textAlign='right';x.textBaseline='middle';for(let i=0;i<=4;i++)x.fillText((i*25)+'',L-7,h-B-(h-T-B)*i/4);x.setLineDash([4,4]);for(let i=1;i<=3;i++){x.beginPath();x.moveTo(L+(w-L-R)*i/4,T);x.lineTo(L+(w-L-R)*i/4,h-B);x.strokeStyle=C.line;x.stroke();x.beginPath();x.moveTo(L,T+(h-T-B)*i/4);x.lineTo(w-R,T+(h-T-B)*i/4);x.strokeStyle=C.line;x.stroke()}x.setLineDash([]);d.forEach(p=>{const px=L+(w-L-R)*p.x/100,py=h-B-(h-T-B)*p.y/100;const rad=5+(p.r||20)/9;const col=p.c==='ok'?C.ok:(p.c==='warn'?C.gold:(p.c==='bad'?C.bad:C.brand));x.beginPath();x.arc(px,py,rad,0,7);x.fillStyle=hexA(col,.2);x.fill();x.strokeStyle=col;x.lineWidth=1.6;x.stroke();x.beginPath();x.arc(px,py,2,0,7);x.fillStyle=col;x.fill();if(p.t){x.fillStyle=C.ink2;x.font='9.5px '+FF();x.textAlign='left';x.textBaseline='middle';x.fillText(p.t,px+rad+3,py)}})};
+AC.heat=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||150);const rows=+cv.dataset.rows||5,cols=+cv.dataset.cols||14;const r=prng(cv.dataset.seed||'h');const gap=3;const cw=(w-gap*(cols-1))/cols,chh=(h-gap*(rows-1))/rows;for(let i=0;i<rows;i++)for(let j=0;j<cols;j++){const v=r();const col=v>.86?C.brand:(v>.7?hexA(C.brand2,.7):(v>.5?hexA(C.brand,.4):(v>.28?hexA(C.brand,.18):C.panel2)));x.fillStyle=col;rr(x,j*(cw+gap),i*(chh+gap),cw,chh,3);x.fill()}};
+AC.waterfall=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||190);const d=JSON.parse(cv.dataset.data||'[]');if(!d.length)return;const L=42,R=10,T=16,B=34;let run=0;const pts=d.map((it,i)=>{if(i===0||i===d.length-1||it.abs){return {s:0,e:it.v,abs:true}}const s=run;run+=it.v;return {s:s,e:run}});const all=[].concat.apply([],[0],[0]).concat(pts.reduce((a,p)=>a.concat([p.s,p.e]),[]));const mn=Math.min.apply(null,all),mx=Math.max.apply(null,all);const Y=v=>h-B-((v-mn)/(mx-mn))*(h-T-B);AC.grid(x,L,w-R,T,h-B,C,4,v=>Math.round(mn+(mx-mn)*v/100));const bw=(w-L-R)/d.length*.54;pts.forEach((p,i)=>{const cx=L+((w-L-R)/d.length)*(i+.5);const y0=Y(Math.max(p.s,p.e)),y1=Y(Math.min(p.s,p.e));const up=(p.e>=p.s);const col=p.abs?C.brand:(up?C.ok:C.bad);x.fillStyle=col;rr(x,cx-bw/2,y0,bw,Math.max(2,y1-y0),3);x.fill();x.fillStyle=C.ink3;x.font='10px '+FF();x.textAlign='center';x.textBaseline='alphabetic';x.fillText(d[i].l,cx,h-12);x.fillStyle=col;x.font='600 10px '+FF();x.fillText((p.abs?'':(d[i].v>0?'+':''))+d[i].v,cx,y0-5)})};
+AC.stackline=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||170);const n=24;const sd=cv.dataset.seed||'k';const s1=AC.series(sd+'1',n,44,13,.5),s2=AC.series(sd+'2',n,26,9,.2),s3=AC.series(sd+'3',n,14,6,.1),s4=AC.series(sd+'4',n,8,4,0);const sets=[[s1,C.brand],[s2,C.brand2],[s3,C.gold],[s4,C.ok]];const L=40,R=10,T=12,B=22;const topAll=[];for(let i=0;i<n;i++)topAll.push(s1[i]+s2[i]+s3[i]+s4[i]);const mx=Math.max.apply(null,topAll)*1.1;AC.grid(x,L,w-R,T,h-B,C,4,v=>Math.round(mx*v/100/10)*10);const X=i=>L+(w-L-R)*i/(n-1);let base=new Array(n).fill(0);sets.forEach(function(pair){const s=pair[0],col=pair[1];const top=base.map((b,i)=>b+s[i]);const g=x.createLinearGradient(0,T,0,h-B);g.addColorStop(0,hexA(col,.55));g.addColorStop(1,hexA(col,.05));x.beginPath();top.forEach((v,i)=>{const py=h-B-(h-B-T)*v/mx;i?x.lineTo(X(i),py):x.moveTo(X(i),py)});for(let i=n-1;i>=0;i--)x.lineTo(X(i),h-B-(h-B-T)*base[i]/mx);x.closePath();x.fillStyle=g;x.fill();x.beginPath();top.forEach((v,i)=>{const py=h-B-(h-B-T)*v/mx;i?x.lineTo(X(i),py):x.moveTo(X(i),py)});x.strokeStyle=col;x.lineWidth=1.8;x.stroke();base=top})};
+AC.box=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||170);const groups=JSON.parse(cv.dataset.data||'null');if(!groups)return;const L=36,R=10,T=14,B=26;const mx=Math.max.apply(null,groups.map(g=>g.e))*1.08;AC.grid(x,L,w-R,T,h-B,C,4,v=>Math.round(mx*v/100));const W=(w-L-R)/groups.length;groups.forEach((g,i)=>{const cx=L+W*(i+.5);const Y=v=>h-B-(h-B-T)*v/mx;x.strokeStyle=C.line2;x.lineWidth=1.4;x.beginPath();x.moveTo(cx,Y(g.a));x.lineTo(cx,Y(g.e));x.stroke();const bw=W*.42;x.fillStyle=hexA(C.brand,.55);rr(x,cx-bw/2,Y(g.d),bw,Math.max(2,Y(g.b)-Y(g.d)),4);x.fill();x.strokeStyle=C.brand;x.stroke();x.beginPath();x.moveTo(cx-bw/2,Y(g.c));x.lineTo(cx+bw/2,Y(g.c));x.strokeStyle=C.gold;x.lineWidth=2.4;x.stroke();x.fillStyle=C.ink3;x.font='10.5px '+FF();x.textAlign='center';x.textBaseline='alphabetic';x.fillText(g.n,cx,h-10)})};
+AC.gantt=(cv)=>{const {x,w,h,C}=setupCanvas(cv,+cv.dataset.h||200);const rows=JSON.parse(cv.dataset.data||'[]');const L=6,R=6,T=6,B=6;const rh=(h-T-B)/rows.length;rows.forEach((r,i)=>{const y=T+i*rh+rh/2;const x0=L+(w-L-R)*r.s/100, x1=L+(w-L-R)*r.e/100;x.fillStyle=C.panel2;rr(x,L,y-5,w-L-R,10,5);x.fill();const col=r.k==='crit'?C.bad:(r.k==='done'?C.ok:(r.k==='ms'?C.ink3:C.brand));const g=x.createLinearGradient(x0,0,x1,0);g.addColorStop(0,hexA(col,.6));g.addColorStop(1,col);x.fillStyle=g;rr(x,x0,y-5,Math.max(3,x1-x0),10,5);x.fill()})};
+AC.draw=function(cv){const t=cv.dataset.achart;try{
+  if(t==='spark')AC.spark(cv);else if(t==='ring')AC.ring(cv);else if(t==='area')AC.area(cv);
+  else if(t==='line')AC.line(cv);else if(t==='dual')AC.dual(cv);else if(t==='bars')AC.bars(cv);
+  else if(t==='stacked')AC.stacked(cv);else if(t==='hbars')AC.hbars(cv);else if(t==='donut')AC.donut(cv);
+  else if(t==='radar')AC.radar(cv);else if(t==='gauge')AC.gauge(cv);else if(t==='scatter')AC.scatter(cv);
+  else if(t==='heat')AC.heat(cv);else if(t==='waterfall')AC.waterfall(cv);else if(t==='stackline')AC.stackline(cv);
+  else if(t==='box')AC.box(cv);else if(t==='gantt')AC.gantt(cv);
+}catch(e){if(window.__dbg)console.warn('chart',t,e)}};
+AC.drawAll=function(root){(root||document).querySelectorAll('canvas[data-achart]').forEach(cv=>AC.draw(cv))};
+window.addEventListener('resize',()=>{clearTimeout(window.__rz);window.__rz=setTimeout(()=>{AC.drawAll(document.querySelector('#content'));AC.drawAll(document.querySelector('#drawer'));},180)});
+
+/* ============================================================
+   3. CST —— 组件工厂
+   ============================================================ */
+const STMAP={'已通过':'ok','待评审':'warn','未开始':'','已驳回':'bad','有条件通过':'warn','已终止':'bad','待关闭':'bad','处理中':'warn','已关闭':'ok','已冻结':'b','待冻结':'warn','评审中':'warn','已实现':'b','已验证':'ok','已批准':'ok','已发布':'ok','待发布':'warn','草稿':'','待审':'warn','已否决':'bad','评估中':'warn','待评估':'warn','已立项':'b','已排期':'warn','待排期':'','预研中':'b','样机验证':'warn','小批量':'warn','概念验证':'','待验证':'warn','验证中':'warn','稳定':'ok','易变':'bad','已上线':'ok','试点中':'warn','探索中':'warn','已实施':'ok','高风险':'bad','中':'warn','低':'ok','高':'bad','致命':'bad','严重':'bad','一般':'warn','提示':'b','警告':'warn','新':'bad','已读':'warn','完成':'ok','open':'bad','Go':'ok','No-Go':'bad','Redirect':'warn','Hold':'warn','成长':'b','成熟':'ok','核心':'b','前沿':'warn','衰退':'bad','维持':'b','已落地':'ok','进行中':'b','已完成':'ok','逾期':'bad','健康':'ok','关注':'warn','预警':'bad','已确认':'warn','已解决':'ok','已生效':'ok','已失效':'','待启动':'','异常':'bad','正常':'ok','降级':'warn','已阻断':'bad','已受理':'b','挂起':'warn','转人工':'warn','已解决 ':'ok','未解决':'bad','已退款':'ok','处理中 ':'warn','已建单':'b','已关单':'ok'};
+
+const CST={};
+CST.panel=(title,body,o)=>{o=o||{};return '<div class="panel" style="'+(o.style||'')+'">'+(title?'<div class="panel-h">'+title+(o.sub?'<span class="sub">'+o.sub+'</span>':'')+'</div>':'')+'<div class="panel-b '+(o.tight?'tight':'')+'">'+body+'</div></div>'};
+CST.kpi=(o)=>'<div class="kpi '+(o.hl?'hl':'')+'" '+(o.rule?'data-rulechip title="'+esc(o.rule)+'"':'')+'>'+
+  '<div class="k-lb">'+o.lb+(o.pair?'<span class="k-pair">⇄ '+o.pair+'</span>':'')+'</div>'+
+  '<div class="k-v '+(o.cls||'')+'">'+o.v+'</div>'+
+  '<div class="k-foot">'+(o.foot||'')+(o.spark?'<canvas class="spark" data-achart="spark" data-up="'+(o.sparkUp?1:0)+'" data-seed="'+esc(o.lb)+'" data-h="'+(o.sh||26)+'" style="width:64px"></canvas>':'')+'</div>'+
+  (o.tip?'<span data-tip>'+(o.tipBody||'口径说明')+'<span class="tipbox">'+esc(o.tip)+'</span></span>':'')+
+  (o.rule?'<div class="rule-anno"><b>⚑ '+esc(o.rule)+'</b><br>'+esc(o.ruleHow||'')+'</div>':'')+'</div>';
+CST.table=(cols,rows,o)=>{o=o||{};return '<div class="'+(o.wrap!==false?'tbl-wrap':'')+'"><table class="dt"><thead><tr>'+cols.map(c=>'<th class="'+(c.r?'r':'')+' '+(c.c?'c':'')+'" '+(c.w?'style="width:'+c.w+'"':'')+'>'+c.t+'</th>').join('')+'</tr></thead><tbody>'+
+ (rows.length?rows.map(r=>'<tr '+(r._row||'')+' class="'+(r._cls||'')+' '+(o.rowlink?'rowlink':'')+'">'+cols.map(c=>'<td class="'+(c.r?'r':'')+' '+(c.c?'c':'')+'" '+(c.mono?'data-m':'' )+'>'+(c.f?c.f(r):esc(r[c.k]!=null?r[c.k]:''))+'</td>').join('')+'</tr>').join(''):'<tr><td colspan="'+cols.length+'"><div class="empty"><span class="em-i">◍</span>'+esc(o.empty||'没有符合条件的数据')+'</div></td></tr>')+
+ '</tbody></table></div>'};
+CST.tbar=(inner)=>'<div class="tbar">'+inner+'<span class="sp"></span></div>';
+CST.st=(s)=>'<span class="tag '+(STMAP[s]||'')+'">'+esc(s)+'</span>';
+CST.note=(k,h,rule)=>'<div class="note '+k+'" '+(rule?'data-rulechip title="'+esc(rule)+'"':'')+'><span class="ni">'+({info:'ⓘ',ok:'✓',warn:'⚠',bad:'⛔'}[k]||'ⓘ')+'</span><div>'+h+'</div></div>';
+CST.anno=(id,txt)=>{const r=R(id);if(!r||!r.t)return '';return '<div class="rule-anno" data-rulechip title="'+esc(r.id+' '+r.t)+'"><b>⚑ '+esc(r.id)+' · '+esc(r.t)+'</b><br>'+esc(txt||r.why)+'</div>'};
+CST.chip=(id,html)=>{const r=R(id);return '<span data-rulechip title="'+esc(r?r.id+' '+r.t:'')+'">'+html+'</span>'};
+CST.stepper=(steps,cur,states)=>'<div class="stepper">'+steps.map((s,i)=>{const st=states&&states[i]?states[i]:(i<cur?'done':(i===cur?'act':''));return '<div class="stp '+st+'"><div class="si">'+(st==='done'?'✓':(st==='bad'?'✕':(st==='hold'?'⏸':i+1)))+'</div><span>'+esc(s)+'</span></div>'}).join('')+'</div>';
+CST.timeline=(items)=>'<div class="tl">'+items.map(i=>'<div class="tl-item '+(i.cls||'')+'"><div class="tl-t">'+i.t+' <span class="muted small" style="font-weight:400">'+(i.who||'')+'</span></div><div class="tl-d">'+(i.d||'')+'</div></div>').join('')+'</div>';
+CST.kv=(pairs)=>pairs.map(p=>'<div class="kv"><span class="k">'+p[0]+'</span><span class="v '+(p[2]?'mono':'')+'">'+p[1]+'</span></div>').join('');
+CST.fld=(label,inner,o)=>{o=o||{};return '<div class="fld'+(o.cls?' '+o.cls:'')+'"><label class="'+(o.req?'req':'')+'">'+label+'</label>'+inner+(o.hint?'<span class="hint">'+o.hint+'</span>':'')+'</div>'};
+CST.sw=(on,act)=>'<span class="switch '+(on?'on':'')+'" data-act="'+(act||'toggle-flag')+'"></span>';
+CST.empty=(t,sub)=>'<div class="empty"><span class="em-i">◍</span>'+esc(t)+(sub?'<div class="small muted" style="margin-top:6px">'+esc(sub)+'</div>':'')+'</div>';
+CST.legend=(items)=>'<div class="legend">'+items.map(i=>'<span><i style="background:'+i[1]+'"></i>'+i[0]+'</span>').join('')+'</div>';
+CST.av=(name)=>{const hue=206+(String(name||'?').charCodeAt(0)%120);return '<span class="avatar" style="background:hsl('+hue+',52%,46%)">'+esc(String(name||'?').slice(0,1).toUpperCase())+'</span>'};
+CST.pagehead=(t,sub,acts)=>'<div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;flex-wrap:wrap"><div style="flex:1;min-width:220px"><div style="font-size:18px;font-weight:750;letter-spacing:-.3px">'+t+'</div><div class="muted small" style="margin-top:3px">'+(sub||'')+'</div></div><div class="btn-row">'+(acts||'')+'</div></div>';
+CST.progress=(p,cls)=>'<div class="progress '+(cls||'')+'"><i style="width:'+Math.min(100,p)+'%"></i></div>';
+CST.score=(lb,v,color)=>'<div class="score-row"><span class="score-lb">'+esc(lb)+'</span><span class="score-bar"><i style="width:'+v+'%;background:'+(color||'linear-gradient(90deg,var(--brand),var(--brand2))')+'"></i></span><span class="score-v">'+v+'</span></div>';
+CST.gantt=(rows)=>'<div class="gantt">'+rows.map(r=>'<div class="gantt-row"><div class="gantt-lb" title="'+esc(r.n)+'">'+esc(r.n)+'</div><div class="gantt-track"><div class="gantt-bar '+(r.k||'')+'" style="left:'+r.s+'%;width:'+Math.max(2,r.e-r.s)+'%" title="'+esc(r.t||'')+'">'+esc(r.t||'')+'</div></div></div>').join('')+'</div>';
+CST.funnel=(rows)=>{const mx=Math.max.apply(null,rows.map(r=>r.v));return '<div class="funnel">'+rows.map(r=>'<div class="fn-row"><span class="fn-lb">'+esc(r.n)+'</span><span class="fn-bar" style="width:'+Math.max(6,88*r.v/mx)+'%;'+(r.c?'background:'+r.c:'')+'">'+r.v+'</span><span class="fn-note">'+esc(r.d||'')+'</span></div>').join('')+'</div>'};
+CST.matrix=(rows,cols,cells,o)=>{o=o||{};return '<div class="matrix-scroll"><table class="mx"><thead><tr><th></th>'+cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+rows.map((r,i)=>'<tr><th>'+esc(r)+'</th>'+cols.map((c,j)=>{const v=cells[i][j];return '<td class="'+(v?('mx-l'+v):'')+'" title="'+esc(o.tip?o.tip(i,j,v):'')+'">'+(v||'')+'</td>'}).join('')+'</tr>').join('')+'</tbody></table></div>'+(o.legend?'<div class="mx-legend">'+o.legend+'</div>':'')};
+CST.trace=(rows,cols,cells)=>'<div class="matrix-scroll"><table class="trace"><thead><tr><th>需求</th>'+cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+rows.map((r,i)=>'<tr><td class="lb">'+r+'</td>'+cols.map((c,j)=>{const v=cells[i][j];const m={y:'✓',p:'~',n:'✕',d:'–'};return '<td><span class="lk '+v+'">'+m[v]+'</span></td>'}).join('')+'</tr>').join('')+'</tbody></table></div>';
+CST.code=(txt)=>'<pre class="code">'+txt+'</pre>';
+CST.elcard=(n,t,d,score,tool)=>{const col=score>=80?'var(--ok)':(score>=65?'var(--brand)':'var(--gold)');return '<div class="elcard"><span class="ec-n">'+esc(n)+'</span><span class="ec-score" style="color:'+col+'">'+score+'</span><div class="ec-t">'+esc(t)+'</div><div class="ec-d">'+esc(d)+'</div>'+(tool?'<div class="small muted" style="margin-top:6px">工具 · '+esc(tool)+'</div>':'')+'</div>'};
+CST.docs=(items)=>items.map(d=>'<div class="doc-item"><span class="di-ic">'+(d.ok?'📄':'📎')+'</span><div style="flex:1;min-width:0"><div style="font-size:12.3px">'+esc(d.n)+'</div><div class="small muted">'+esc(d.d||'')+'</div></div>'+(d.st?CST.st(d.st):(d.ok?'<span class="tag ok">已齐套</span>':'<span class="tag bad">缺失</span>'))+'</div>').join('');
+CST.diff=(before,after,label)=>'<div class="diff"><div class="d-h">'+esc(label||'变更前后对比')+'</div><div class="d-del"><span class="mono">- </span>'+esc(before)+'</div><div class="d-add"><span class="mono">+ </span>'+esc(after)+'</div></div>';
+CST.chat=(list)=>'<div style="display:flex;flex-direction:column;gap:14px">'+list.map(m=>m.who==='user'
+ ? '<div style="display:flex;gap:10px;justify-content:flex-end"><div style="max-width:78%;background:var(--brand-bg);border:1px solid rgba(79,108,255,.25);border-radius:12px 12px 3px 12px;padding:10px 14px;font-size:12.6px">'+m.t+'</div><span class="avatar" style="background:linear-gradient(135deg,var(--brand),var(--brand2))">我</span></div>'
+ : '<div style="display:flex;gap:10px"><span class="avatar" style="background:linear-gradient(135deg,var(--ok),var(--brand))">AI</span><div style="max-width:82%;background:var(--panel2);border:1px solid var(--line);border-radius:12px 12px 12px 3px;padding:11px 14px;font-size:12.6px;line-height:1.78">'+m.t+'</div></div>').join('')+'</div>';
+CST.audit=(rows)=>CST.table([{t:'时间',f:r=>'<span class="mono small muted">'+r.t+'</span>'},{t:'操作人',f:r=>r.u+' <span class="tag">'+r.r+'</span>'},{t:'动作',k:'a'},{t:'对象',f:r=>'<span class="muted">'+esc(r.o)+'</span>'},{t:'来源 IP',f:r=>'<span class="mono small">'+r.ip+'</span>'}],rows);
+CST.chipRow=(items)=>'<div style="display:flex;gap:7px;flex-wrap:wrap">'+items.map(i=>'<span class="tag '+(i[1]||'')+'">'+i[0]+'</span>').join('')+'</div>';
+CST.healthDot=(h)=>'<span class="dot '+h+'"></span>';
+CST.box=(o)=>'<div class="wcard" style="'+(o.style||'')+'"><div class="w-t">'+o.t+'</div><div class="w-v '+(o.cls||'')+'">'+o.v+'</div>'+(o.d?'<div class="small muted" style="margin-top:2px">'+o.d+'</div>':'')+'</div>';
+
+/* 弹窗外壳与表单控件 */
+CST.dlg=(o)=>{o=o||{};if(typeof DLGW!=='undefined')DLGW=o.wide||0;
+  return '<div class="modal-h">'+o.t+(o.tag?' <span class="tag '+(o.tc||'')+'">'+o.tag+'</span>':'')
+    +(o.sub?'<div class="mh-sub">'+o.sub+'</div>':'')
+    +'<span class="mh-x" data-act="close-modal">✕</span></div>'
+    +'<div class="modal-b">'+(o.body||'')+'</div>'
+    +'<div class="modal-f">'+(o.foot!==undefined?o.foot
+      :'<button class="btn" data-act="close-modal">取消</button><button class="btn p" data-act="close-modal">关闭</button>')+'</div>'};
+CST.fs=(t,tag)=>'<div class="fs-title">'+t+(tag?'<span class="tag">'+tag+'</span>':'')+'</div>';
+CST.mrow=(inner,cls)=>'<div class="mrow '+(cls||'')+'">'+inner+'</div>';
+CST.tinp=(o)=>{o=o||{};return '<input class="inp'+(o.mono?' mono':'')+'" '+(o.id?'id="'+o.id+'" ':'')
+  +'type="'+(o.type||'text')+'" style="width:100%;'+(o.st||'')+'" placeholder="'+esc(o.ph||'')+'"'
+  +(o.m?' data-model="'+o.m+'"':'')+' value="'+esc(o.v==null?'':o.v)+'"'+(o.r?' readonly':'')+'>'};
+CST.tsel=(o)=>{o=o||{};return '<select class="inp" '+(o.id?'id="'+o.id+'" ':'')+'style="width:100%;'+(o.st||'')
+  +'"'+(o.m?' data-model="'+o.m+'"':'')+'>'
+  +o.opts.map(x=>'<option'+(String(x)===String(o.v)?' selected':'')+'>'+esc(x)+'</option>').join('')+'</select>'};
+CST.tta=(o)=>{o=o||{};return '<textarea class="inp" '+(o.id?'id="'+o.id+'" ':'')+'rows="'+(o.rows||3)+'" style="width:100%"'
+  +(o.m?' data-model="'+o.m+'"':'')+' placeholder="'+esc(o.ph||'')+'">'+esc(o.v||'')+'</textarea>'};
+CST.chk=(items,k,cls)=>'<div class="chklist '+(cls||'')+'">'+items.map((it,i)=>
+  '<div class="ci'+(fsHas(k,i)?' on '+(it.cls||''):'')+'" data-act="fchk" data-k="'+k+'" data-i="'+i+'">'
+  +'<span class="cbox"></span><span style="flex:1"><span class="ct">'+it.t+'</span>'
+  +(it.d?'<div class="cd">'+it.d+'</div>':'')+'</span>'
+  +(it.md?'<span class="cmeta">'+it.md+'</span>':'')+'</div>').join('')+'</div>';
+CST.rds=(opts,k,cls)=>{const cur=FSTATE[k];return '<div class="rcards '+(cls||'')+'">'+opts.map(x=>
+  '<div class="rc'+(x.v===cur?' on '+(x.cls||''):'')+'" data-act="fset" data-k="'+k+'" data-v="'+esc(x.v)+'">'
+  +'<div class="rt" style="'+(x.color?'color:'+x.color:'')+'">'+x.t+'</div><div class="rd">'+x.d+'</div></div>').join('')+'</div>'};
+CST.segx=(items,k)=>{const cur=FSTATE[k];return '<div class="seg">'+items.map(x=>
+  '<i class="'+(x===cur?'on':'')+'" data-act="fset" data-k="'+k+'" data-v="'+esc(x)+'">'+esc(x)+'</i>').join('')+'</div>'};
+CST.tps=(items,k)=>'<div class="tag-pick">'+items.map(x=>
+  '<span class="tpk'+(fsHas(k,x)?' on':'')+'" data-act="flist" data-k="'+k+'" data-v="'+esc(x)+'">'+esc(x)+'</span>').join('')+'</div>';
+CST.prv=(rows)=>'<div class="pv">'+rows.map(r=>'<div class="pv-r"><span class="pv-k">'+r[0]+'</span><span class="pv-v">'+(r[1]==null?'<span class="muted">—</span>':r[1])+'</span></div>').join('')+'</div>';
+CST.bm=(rows)=>'<div class="big-metric">'+rows.map(r=>'<div class="bm"><div class="lb">'+r[0]+'</div><div class="v" '+(r[4]?'id="'+r[4]+'"':'')+' style="'+(r[2]?'color:'+r[2]:'')+(r[3]?';'+r[3]:'')+'">'+r[1]+'</div></div>').join('')+'</div>';
+CST.rng=(o)=>'<div class="range-row"><span class="rl">'+o.lb+'</span><input type="range" data-act="frng" data-k="'+o.k+'" data-suf="'+esc(o.suf||'')+'" min="'+o.min+'" max="'+o.max+'" step="'+(o.step||1)+'" value="'+o.v+'"><span class="rv" id="rv-'+o.k+'">'+o.disp+'</span></div>';
+CST.wz=(steps,cur)=>'<div class="wz">'+steps.map((x,i)=>'<div class="wzi '+(i<cur?'done':i===cur?'on':'')+'"><span class="wn">'+(i<cur?'✓':(i+1))+'</span>'+esc(x)+'</div>'
+  +(i<steps.length-1?'<span class="wz-l'+(i<cur?' done':'')+'"></span>':'')).join('')+'</div>';
+CST.mnote=(t,cls,icon)=>{const ic={'b':'◈','g':'✓','y':'▲','r':'⛔'}[cls]||'◈';
+  return '<div class="mnote '+cls+'"><span class="mi">'+(icon||ic)+'</span><div>'+t+'</div></div>'};
+CST.mtabs=(items,k)=>{const cur=FSTATE[k]||items[0];return '<div class="mtabs">'+items.map(x=>
+  '<div class="mtab'+(x===cur?' on':'')+'" data-act="fset" data-k="'+k+'" data-v="'+esc(x)+'">'+esc(x)+'</div>').join('')+'</div>'};
+CST.pgrp=(rows)=>'<div class="pgrp">'+rows.map(r=>'<div class="pr"><span class="pl">'+r[0]+'</span><span class="pb">'+CST.progress(r[1],r[2])+'</span><span class="pn">'+r[3]+'</span></div>').join('')+'</div>';
+CST.twofa=(act,label,extra)=>'<div class="modal-h">'+label+'</div><div class="modal-b">'+CST.note('warn','该操作属于<b>敏感操作</b>：执行后强制要求动态验证码（演示中自动填充），并写入<b>不可篡改的操作审计日志</b>（操作人、时间戳、IP、对象、前后值）。')+
+  (extra||'')+CST.fld('动态口令（Authenticator）','<input class="inp mono" style="width:100%" value="418 206" readonly>')+
+  '</div><div class="modal-f"><button class="btn" data-act="close-modal">取消</button><button class="btn p" data-act="'+act+'">确认执行</button></div>';
+const C=CST;
+
+/* ============================================================
+   4. 运行时
+   ============================================================ */
+const STATE={route:'dash',theme:'dark',ruleOn:false,group:0,q:'',flags:{},tab:{},fav:[]};
+let FSTATE={},CURDLG=null,CUR_EL=null,DLGW=0;
+let RULES=[];function R(id){return RULES.filter(r=>r.id===id)[0]||null}
+function toast(msg,kind){
+  const d=document.createElement('div');
+  d.className='toast '+(kind||'');
+  d.innerHTML='<span>'+(kind==='bad'?'⛔':(kind==='warn'?'⚠':(kind==='ok'?'✓':'ⓘ')))+'</span><div>'+msg+'</div>';
+  $('#toasts').appendChild(d);
+  setTimeout(()=>{d.style.opacity='0';d.style.transform='translateX(14px)';d.style.transition='.3s'},3600);
+  setTimeout(()=>d.remove(),4000);
+}
+function openModal(html,wide){const m=$('#modal');m.className='modal'+(wide===2?' wide2':wide===3?' wide3':wide?' wide':'');m.innerHTML=html;$('[data-mmask]').classList.add('on');m.classList.add('on');AC.drawAll(m)}
+function closeModal(){$('[data-mmask]').classList.remove('on');$('#modal').classList.remove('on')}
+function openDrawer(title,html,wide){
+  $('#drawer').className='drawer'+(wide?' wide':'');
+  $('#drawer').innerHTML='<div class="drawer-h"><b>'+title+'</b><span class="x" data-act="close-drawer">✕</span></div><div class="drawer-b">'+html+'</div>';
+  $('[data-dmask]').classList.add('on'); $('#drawer').classList.add('on');
+  AC.drawAll($('#drawer'));
+}
+function closeDrawer(){$('[data-dmask]').classList.remove('on');$('#drawer').classList.remove('on')}
+
+function showDlg(fn,el){CURDLG=fn;CUR_EL=el||null;FSTATE=(fn.init&&fn.init())||{};openModal(fn(CUR_EL),DLGW)}
+function capDlg(){const m=$('#modal');if(!m)return;m.querySelectorAll('[data-model]').forEach(el=>{FSTATE[el.getAttribute('data-model')]=el.value;})}
+function reDlg(){capDlg();if(CURDLG)openModal(CURDLG(CUR_EL),DLGW)}
+function fsGet(k,d){return FSTATE[k]===undefined?d:FSTATE[k]}
+function fsSet(k,v){FSTATE[k]=v}
+function fsTog(k){FSTATE[k]=!FSTATE[k]}
+function fsList(k,i){const a=FSTATE[k]||(FSTATE[k]=[]);const p=a.indexOf(i);if(p>=0)a.splice(p,1);else a.push(i);return a}
+function fsHas(k,i){return (FSTATE[k]||[]).indexOf(i)>=0}
+function dlgClose(){CURDLG=null;CUR_EL=null;closeModal()}
+function syncRuleUI(){const w=$('#wb');if(w)w.classList.toggle('rule-on',STATE.ruleOn);const b=$('#ruleBtn');if(b)b.classList.toggle('on',STATE.ruleOn)}
+
+/* ⌘K */
+let palHits=[],palIdx=0;
+function palItems(){
+  const a=[];
+  NAV.forEach(g=>g.items.forEach(i=>a.push({t:i.n,k:g.g+' › 页面',i:i.i,go:i.id})));
+  (window.PAL_EXTRA||[]).forEach(x=>a.push(x));
+  return a;
+}
+function openPalette(){
+  const all=palItems();
+  const q=(STATE.q||'').trim().toLowerCase();
+  palHits=q?all.filter(x=>(x.t+x.k).toLowerCase().indexOf(q)>=0).slice(0,40):all.slice(0,40);
+  palIdx=0;renderPal();
+  $('#palette').classList.add('on');$('[data-pmask]').classList.add('on');
+  const inp=$('#palInput');inp.value=STATE.q||'';setTimeout(()=>inp.focus(),40);
+}
+function closePalette(){$('#palette').classList.remove('on');$('[data-pmask]').classList.remove('on')}
+function renderPal(){
+  const L=$('#palList');
+  if(!palHits.length){L.innerHTML='<div class="pal-empty">没有匹配「'+esc(STATE.q)+'」的页面或动作</div>';return}
+  let html='',lastK=null;
+  palHits.forEach((x,i)=>{
+    if(x.k!==lastK){html+='<div class="pal-hd">'+esc(x.k)+'</div>';lastK=x.k}
+    html+='<div class="pal-item'+(i===palIdx?' on':'')+'" data-pal="'+i+'"><span class="pi">'+x.i+'</span><span>'+esc(x.t)+'</span><span class="pk">↵</span></div>';
+  });
+  L.innerHTML=html;
+}
+function palGo(i){const x=palHits[i];if(!x)return;closePalette();STATE.q='';if(x.go)go(x.go);else if(x.act)doAct(x.act,{})}
+$('#palInput').addEventListener('input',e=>{STATE.q=e.target.value;const all=palItems();const q=STATE.q.trim().toLowerCase();palHits=q?all.filter(x=>(x.t+x.k).toLowerCase().indexOf(q)>=0).slice(0,40):all.slice(0,40);palIdx=0;renderPal()});
+$('#palInput').addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'){e.preventDefault();palIdx=Math.min(palIdx+1,palHits.length-1);renderPal()}
+  else if(e.key==='ArrowUp'){e.preventDefault();palIdx=Math.max(palIdx-1,0);renderPal()}
+  else if(e.key==='Enter'){e.preventDefault();palGo(palIdx)}
+  else if(e.key==='Escape'){closePalette()}
+});
+
+/* 渲染 */
+/* NAV 由 builder 注入；V 为页面注册表 */
+var V={};
+function badgeOf(i){try{const b=i.badge;if(!b)return 0;return typeof b==='function'?b():(typeof b==='number'?b:0)}catch(e){return 0}}
+function navIndexOf(id){return NAV.findIndex(g=>g.items.some(x=>x.id===id))}
+function renderTopNav(){
+  const el=$('#topNav');if(!el)return;
+  el.innerHTML=NAV.map((g,i)=>'<div class="tn-item'+(STATE.group===i?' on':'')+'" data-topnav="'+i+'" title="'+esc(g.d||g.g)+'">'+esc(g.g)+'</div>').join('');
+}
+function goGroup(i){STATE.group=i;const g=NAV[i];if(g&&g.items.length)go(g.items[0].id);else renderTopNav()}
+function renderNav(){
+  const el=$('#sideNav');if(!el)return;
+  el.innerHTML=NAV.map(g=>'<div class="nav-group">'+esc(g.g)+(g.d?'<span class="ng-d">'+esc(g.d)+'</span>':'')
+    +g.items.map(i=>'<div class="nav-item'+(STATE.route===i.id?' on':'')+'" data-nav="'+i.id+'"><span class="ni">'+i.i+'</span><span class="sb-txt">'+esc(i.n)+'</span>'
+    +(badgeOf(i)?'<span class="cnt'+(i.badgeClass||'')+'">'+badgeOf(i)+'</span>':'')+'</div>').join('')+'</div>').join('');
+}
+function renderCrumb(){
+  const gi=navIndexOf(STATE.route);
+  const g=gi>=0?NAV[gi]:null;
+  const it=g?g.items.filter(x=>x.id===STATE.route)[0]:null;
+  $('#crumb').innerHTML=(g?'<span class="cb-g">'+esc(g.g)+'</span><span class="cb-sep">/</span>':'')+'<b>'+esc(it?it.n:(V[STATE.route]?V[STATE.route].t:STATE.route))+'</b>';
+  $('#subRight').innerHTML='<span class="cb-role">'+esc(window.ROLE_NAME||'运营管理员')+'</span><span class="cb-env">'+esc(window.ENV||'PROD · DEMO')+'</span><span class="mono">'+nowTime().slice(11)+'</span>';
+}
+function render(){
+  const c=$('#content'); const v=V[STATE.route];
+  if(!v){STATE.route=NAV[0].items[0].id;return render()}
+  c.innerHTML=v.render();
+  c.scrollTop=0;
+  c.classList.remove('page-in'); void c.offsetWidth; c.classList.add('page-in');
+  AC.drawAll(c);
+  renderTopNav(); renderNav(); renderCrumb();
+}
+function go(id){
+  if(!V[id]){toast('页面「'+id+'」不存在','warn');return}
+  STATE.route=id; const gi=navIndexOf(id); if(gi>=0)STATE.group=gi;
+  const el=$('#content'); if(el)el.innerHTML='';
+  render();
+}
+function syncTop(){}
+
+/* 事件委托：单一 click 监听 */
+function doAct(A,t,el){
+  /* 通用 UI */
+  if(A==='fold'){$('#wb').classList.toggle('folded');setTimeout(()=>AC.drawAll(document.querySelector('#content')),280);return}
+  if(A==='theme'){
+    STATE.theme=STATE.theme==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',STATE.theme);
+    setTimeout(()=>{AC.drawAll(document.querySelector('#content'));AC.drawAll(document.querySelector('#drawer'))},60);
+    toast('已切换为'+(STATE.theme==='dark'?'深色':'浅色')+'主题','ok'); return;
+  }
+  if(A==='rule-toggle'){
+    STATE.ruleOn=!STATE.ruleOn;syncRuleUI();
+    toast(STATE.ruleOn?'已开启业务规则标注：页面上的 ⚑ 区域即为该规则的落点，共 <b>'+RULES.length+'</b> 条规则':'已关闭规则标注','ok');
+    return;
+  }
+  if(A==='bell'){toggleBell();return}
+  if(A==='bell-all'){STATE.notifications.forEach(n=>n.read=true);syncBell();renderBell();toast('通知已全部标记为已读','ok');return}
+  if(A==='bell-read'){const i=+t.getAttribute('data-i');if(STATE.notifications[i])STATE.notifications[i].read=true;syncBell();renderBell();return}
+  if(A==='palette'){openPalette();return}
+  if(A==='close-drawer'){closeDrawer();return}
+  if(A==='close-modal'){dlgClose();return}
+  if(A==='dlg-close'){dlgClose();return}
+  // 任何以 dlg-done/ 提交类动作（save/submit/confirm/ok）开头的手势，先采集表单值
+  if(/^(dlg-|.*-submit$|.*-save$|.*-confirm$|.*-ok$)/.test(A)){capDlg()}
+  /* 弹窗表单状态机 */
+  if(A==='fchk'){fsList(t.getAttribute('data-k'),+t.getAttribute('data-i'));reDlg();return}
+  if(A==='fset'){fsSet(t.getAttribute('data-k'),t.getAttribute('data-v'));reDlg();return}
+  if(A==='flist'){fsList(t.getAttribute('data-k'),t.getAttribute('data-v'));reDlg();return}
+  if(A==='fstep'){const k=t.getAttribute('data-k');const d=+(t.getAttribute('data-d')||1);FSTATE[k]=(+fsGet(k,0))+d;reDlg();return}
+  if(A==='frng'){
+    const k=t.getAttribute('data-k');const v=+t.value;fsSet(k,v);
+    const suf=t.getAttribute('data-suf')||'';
+    const rv=t.parentElement?t.parentElement.querySelector('.rv'):null;
+    if(rv)rv.textContent=v+suf;
+    return;
+  }
+  if(A==='ftab'){STATE.tab[STATE.route]=t.getAttribute('data-v');render();return}
+  if(A==='tab'){STATE.tab[STATE.route]=t.getAttribute('data-v');render();return}
+  if(A==='flag'){const k=t.getAttribute('data-k')||('f'+(STATE.route));STATE.flags[k]=!STATE.flags[k];render();return}
+  if(A==='search'){
+    const q=(t.getAttribute('data-q')||'').toLowerCase();
+    const tb=t.getAttribute('data-tb');
+    if(tb){const rows=JSON.parse(tb||'[]');toast('在「'+esc(t.getAttribute('data-scope')||'当前页')+'」中匹配到 <b>'+rows.length+'</b> 条：'+rows.slice(0,3).map(esc).join('、'),rows.length?'ok':'warn')}
+    else toast('已应用筛选：'+esc(q||'全部'),'ok');
+    return;
+  }
+  /* 由各项目 spec 扩展 */
+  if(window.ACT_EXTRA&&window.ACT_EXTRA[A]){window.ACT_EXTRA[A](t,el);return}
+  toast('动作「'+A+'」已触发（演示数据）','');
+}
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-act],[data-go],[data-open],[data-topnav],[data-nav],[data-pal]');
+  if(!t)return;
+  if(t.hasAttribute('data-topnav')){goGroup(+t.getAttribute('data-topnav'));return}
+  if(t.hasAttribute('data-nav')){go(t.getAttribute('data-nav'));return}
+  if(t.hasAttribute('data-pal')){palGo(+t.getAttribute('data-pal'));return}
+  if(t.hasAttribute('data-go')){go(t.getAttribute('data-go'));return}
+  if(t.hasAttribute('data-open')){const k=t.getAttribute('data-open');if(window.DRAWERS&&window.DRAWERS[k]){const r=window.DRAWERS[k](t);openDrawer(r[0],r[1],r[2])}return}
+  const A=t.getAttribute('data-act');
+  if(!A)return;
+  /* 登录 */
+  if(A==='do-login'||A==='login'){
+    $('#loginMask').classList.add('bye');
+    setTimeout(()=>{toast('已安全登录 · 会话已建立','ok');toast('提示：点击右上角 ⚑ 可开启「业务规则标注」模式，查看每条规则在页面上的落点','')},420);
+    return;
+  }
+  doAct(A,t,t);
+});
+document.addEventListener('input',e=>{
+  const t=e.target.closest('[data-inp]');if(t){const k=t.getAttribute('data-inp');if(window.INPUT_EXTRA)window.INPUT_EXTRA(k,t.value,t);return}
+  const r=e.target.closest('input[type=range][data-act="frng"]');
+  if(r){const k=r.getAttribute('data-k');const v=+r.value;fsSet(k,v);
+    const suf=r.getAttribute('data-suf')||'';
+    const rv=r.parentElement?r.parentElement.querySelector('.rv'):null;
+    if(rv)rv.textContent=v+suf;}
+});
+document.addEventListener('change',e=>{
+  const r=e.target.closest('input[type=range][data-act="frng"]');
+  if(r){const k=r.getAttribute('data-k');const v=+r.value;fsSet(k,v);
+    const suf=r.getAttribute('data-suf')||'';
+    const rv=r.parentElement?r.parentElement.querySelector('.rv'):null;
+    if(rv)rv.textContent=v+suf;}
+});
+document.addEventListener('change',e=>{const t=e.target.closest('[data-sel]');if(!t)return;const k=t.getAttribute('data-sel');if(window.CHANGE_EXTRA)window.CHANGE_EXTRA(k,t.value,t)});
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openPalette();return}
+  if(e.key==='Escape'){closePalette();closeModal();closeDrawer()}
+});
+document.querySelectorAll('[data-dmask]').forEach(m=>m.addEventListener('click',closeDrawer));
+document.querySelectorAll('[data-mmask]').forEach(m=>m.addEventListener('click',closeModal));
+document.querySelectorAll('[data-pmask]').forEach(m=>m.addEventListener('click',closePalette));
+
+/* 通知中心 */
+function toggleBell(){const w=$('#bellWrap');if(w)w.classList.toggle('open')}
+function syncBell(){const b=$('#bellBadge');if(!b)return;const n=STATE.notifications.filter(x=>!x.read).length;b.textContent=n;b.style.display=n?'grid':'none'}
+function renderBell(){
+  const p=$('#bellPanel');if(!p)return;
+  p.innerHTML='<div class="bp-h">🔔 通知中心<span class="muted small" style="margin-left:auto;font-weight:400">'+STATE.notifications.filter(x=>!x.read).length+' 条未读</span></div>'
+    +(STATE.notifications.length?STATE.notifications.map((n,i)=>'<div class="bp-item'+(n.read?' read':'')+'" data-act="bell-read" data-i="'+i+'"><span class="bp-ic">'+(n.k==='bad'?'⛔':(n.k==='warn'?'⚠':(n.k==='ok'?'✓':'ⓘ')))+'</span><div style="flex:1"><b>'+esc(n.t)+'</b><div class="small muted">'+esc(n.d)+'</div></div><span class="small muted mono">'+esc(n.time||'')+'</span></div>').join(''):'<div class="pal-empty">暂无通知</div>')
+    +'<div class="bp-f"><button class="btn sm" data-act="bell-all" style="width:100%">全部标记为已读</button></div>';
+}
+
+/* 启动 */
+function boot(){
+  STATE.notifications=(typeof MS!=='undefined'&&MS&&MS.notifications)?MS.notifications:[];
+  renderTopNav();renderNav();syncBell();renderBell();render();
+  const w=$('#wb');if(w&&!w.classList.contains('rule-on'))syncRuleUI();
+}
+
+const ROLE_NAME="投放优化师";
+const ENV="PROD · DEMO";
+RULES=[{"id": "R1", "t": "归因口径跟随平台统一版本", "why": "各平台默认窗口天然不同（Meta 7天点击/1天浏览、Google 30天点击）。我看到的数据已经按统一口径算好了，不要因为某平台数字好看就手动改窗口，那会让预算分配偏向末位渠道。"}, {"id": "R2", "t": "不得用营收口径判断投放效率", "why": "看 GMV 会觉得高客单活动很赚。轻量徒步鞋 GMV ROAS 4.9，利润 ROAS 只有 0.9——照着 GMV 加预算就是越花越亏。系统里的调价建议都按利润口径给。"}, {"id": "R3", "t": "退款拒付到账即冲减并回写活动", "why": "服饰退款高峰在成交后 7-30 天。到账即冲减并回写我的活动成本，ROAS 才不会虚高 20%-40%，也不会等次月复盘才发现已经破成本线。"}, {"id": "R4", "t": "学习期内只做微调", "why": "我管的 6 个活动里有 3 个在学习期。期内改定向、改出价策略会让模型清零重学，实测 CPA 反升 30%；只允许同向、幅度不超过 20% 的预算微调。"}, {"id": "R5", "t": "预算单次上调不超过 30%", "why": "单次上调超 30% 或 6 小时内二次上调，模型会反复重新学习，消耗曲线剧烈震荡。需要加预算时走调价建议，一次一档。"}, {"id": "R6", "t": "回传中断必须立即处理", "why": "我的 Meta 回传已经断了 42 分钟，这段时间烧掉的 ¥24,180 一分钱转化都没归到我的活动上，平台还在照常花钱。先熔断再排查。"}, {"id": "R7", "t": "先止损再复盘", "why": "回传断了每拖 1 小时，损失按比例放大；复盘可以事后做。处置顺序永远是：熔断止损 → 修链路 → 补回传 → 复盘。"}, {"id": "R8", "t": "低毛利 SKU 不能加预算", "why": "轻量徒步鞋毛利率 21%，加预算就是放大亏损。加预算前先看这个活动的利润 ROAS 和 SKU 毛利率是不是真的健康。"}, {"id": "R9", "t": "违规素材必须下线并归档", "why": "只下线不归档，素材轮播半个月后会重新选中它，账户再次限流。二次违规的处罚通常是初次的数倍，代价远超那条素材本身。"}, {"id": "R10", "t": "我的权限只到活动级", "why": "我只能调自己负责的 6 个活动，预算单次上限 30%，且学习期内不能做结构性修改。权限收敛是为了让一次误操作只影响一个活动。"}];
+const NAV=[{"g": "我的今天", "d": "打开就能用", "items": [{"id": "pers_home", "n": "我的投放驾驶舱", "i": "◎", "badge": "null", "badgeClass": ""}, {"id": "pers_today", "n": "今日投放", "i": "◴", "badge": "null", "badgeClass": ""}, {"id": "pers_alert", "n": "我的告警", "i": "⚠", "badge": "()=>4", "badgeClass": ""}, {"id": "pers_task", "n": "我的待办", "i": "☑", "badge": "()=>3", "badgeClass": ""}]}, {"g": "我的投放", "d": "管好我管的 6 个活动", "items": [{"id": "pers_camp", "n": "我的广告活动", "i": "▤", "badge": "()=>6", "badgeClass": ""}, {"id": "pers_bid", "n": "我的调价建议", "i": "⇅", "badge": "()=>6", "badgeClass": ""}, {"id": "pers_pace", "n": "今日分时消耗", "i": "▦", "badge": "null", "badgeClass": ""}, {"id": "pers_ab", "n": "我的 A/B 测试", "i": "⇆", "badge": "null", "badgeClass": ""}]}, {"g": "我的资产", "d": "素材与商品", "items": [{"id": "pers_asset", "n": "我的素材", "i": "▣", "badge": "()=>2", "badgeClass": ""}, {"id": "pers_sku", "n": "我的 SKU", "i": "⌗", "badge": "null", "badgeClass": ""}]}, {"g": "我的数据", "d": "回传与核算", "items": [{"id": "pers_conv", "n": "我的转化回传", "i": "⇄", "badge": "()=>1", "badgeClass": ""}, {"id": "pers_roi", "n": "我的效果核算", "i": "※", "badge": "null", "badgeClass": ""}]}, {"g": "我的成长", "d": "绩效与设置", "items": [{"id": "pers_perf", "n": "我的绩效", "i": "◍", "badge": "null", "badgeClass": ""}, {"id": "pers_pref", "n": "我的偏好设置", "i": "⚒", "badge": "null", "badgeClass": ""}]}];
+
+const MS={notifications:[
+  {t:'回传中断 42 分钟',d:'你的 MC-7710892 活动已消耗 ¥24,180 但无转化回传，请立即处理',k:'bad',time:'09:42',read:false},
+  {t:'调价建议待确认',d:'6 条待确认，其中 3 条建议下调预算（利润 ROAS 低于目标）',k:'warn',time:'09:20',read:false},
+  {t:'素材疑似违规',d:'CR-8842「7 天可见干法」被判医疗功效暗示，请确认处置',k:'warn',time:'08:20',read:false},
+  {t:'今日预算已用 91%',d:'你负责的 6 个活动今日合计消耗 ¥8.2万 / 预算 ¥9万',k:'info',time:'14:06',read:true},
+  {t:'昨日日报已生成',d:'你负责活动的利润日报已出，可在报表里看',k:'ok',time:'09:00',read:true}
+]};
+
+const PLAT=['Google Ads','Meta','TikTok Ads','Amazon Ads','Microsoft Ads','巨量引擎','磁力引擎','阿里妈妈','腾讯广告','快手'];
+const PCOL={'Google Ads':'#4f6cff','Meta':'#1877f2','TikTok Ads':'#25f4ee','Amazon Ads':'#ff9900','Microsoft Ads':'#00a4ef','巨量引擎':'#1664ff','磁力引擎':'#c05cff','阿里妈妈':'#ff5000','腾讯广告':'#00a3ff','快手':'#ff6600'};
+function ptag(p){return '<span class="tag" style="color:'+(PCOL[p]||'#8a94a6')+';border-color:'+(PCOL[p]||'#8a94a6')+'44">'+esc(p)+'</span>'}
+function pav(p){return '<span class="avatar" style="background:'+(PCOL[p]||'#5b6472')+'">'+esc(String(p||'AD').slice(0,1))+'</span>'}
+function money(n){return '¥'+Math.round(Number(n)||0).toLocaleString('zh-CN')}
+function wmoney(n){return '¥'+(Number(n)/10000).toFixed(1)+'万'}
+function pc2(n){return (Number(n)*100).toFixed(1)+'%'}
+function ctg(s){const m={'投放中':'ok','已暂停':'','学习中':'warn','待审核':'warn','已归档':'','受限':'warn','已终止':'bad','草稿':'','复投中':'ok'};return '<span class="tag '+(m[s]||'')+'">'+esc(s)+'</span>'}
+function rtg(s){const m={'高':'bad','中':'warn','低':'ok','致命':'bad','严重':'bad','一般':'warn','提示':'b'};return '<span class="tag '+(m[s]||'')+'">'+esc(s)+'</span>'}
+function roas(v){const c=v>=4?'var(--ok)':(v>=2.1?'var(--gold)':'var(--bad)');return '<b class="mono" style="color:'+c+'">'+Number(v).toFixed(2)+'</b>'}
+function krow(a){return '<div class="kpis" style="margin-bottom:14px">'+a.map(function(x){return C.kpi(x)}).join('')+'</div>'}
+function sec(t,r){return '<div class="sec-title">'+esc(t)+(r?'<span class="muted small" style="font-weight:400">'+esc(r)+'</span>':'')+'</div>'}
+
+/* 我负责的 6 个活动 */
+const MC=[
+ {id:'MC-7710892',n:'US-IG-通投-18-34-兴趣',p:'Meta',s:'投放中',bud:26000,sp:24180,roas:2.86,pm:1.34,gmv:69175,ctr:1.6,cpc:2.36,cvr:2.9,lr:'已完成',lv:32,ty:'信息流',cpa:112.86},
+ {id:'MC-7710955',n:'US-FB-再营销-加购未购',p:'Meta',s:'投放中',bud:12000,sp:9860,roas:5.12,pm:2.88,gmv:50483,ctr:2.4,cpc:1.42,cvr:5.2,lr:'学习中',lv:34,ty:'再营销',cpa:64.28},
+ {id:'MC-7711042',n:'US-FB-视频观看-冷启组',p:'Meta',s:'投放中',bud:20000,sp:19840,roas:1.68,pm:0.74,gmv:33331,ctr:1.1,cpc:2.62,cvr:1.6,lr:'学习中',lv:12,ty:'信息流',cpa:242.86},
+ {id:'TC-3390611',n:'US-TT-达人切片-爆量组',p:'TikTok Ads',s:'投放中',bud:15000,sp:14860,roas:1.94,pm:0.86,gmv:28828,ctr:1.2,cpc:1.08,cvr:1.9,lr:'受限',lv:28,ty:'短视频',cpa:142.64},
+ {id:'TC-3390728',n:'US-TT-品牌-强钩子素材',p:'TikTok Ads',s:'投放中',bud:10000,sp:8620,roas:2.42,pm:1.18,gmv:20840,ctr:1.8,cpc:0.96,cvr:2.4,lr:'学习中',lv:26,ty:'短视频',cpa:96.24},
+ {id:'GC-884331',n:'US-品牌词-精确匹配-01',p:'Google Ads',s:'投放中',bud:28000,sp:26420,roas:5.42,pm:2.94,gmv:143196,ctr:3.4,cpc:1.68,cvr:6.2,lr:'已完成',lv:0,ty:'搜索',cpa:48.62}
+];
+/* 我的调价建议 */
+const MSUG=[
+ {id:'SG-3182',c:'MC-7711042',n:'US-FB-视频观看-冷启组',act:'下调 40%',cur:'¥20,000',nxt:'¥12,000',why:'利润 ROAS 0.74，远低于 2.10 目标；CPA ¥242.86 超类目上限 71%',cf:0.94,st:'待确认',tp:'down'},
+ {id:'SG-3183',c:'TC-3390611',n:'US-TT-达人切片-爆量组',act:'下调 25%',cur:'¥15,000',nxt:'¥11,250',why:'素材受限导致转化下滑，利润 ROAS 0.86；等待合规结论',cf:0.88,st:'待确认',tp:'down'},
+ {id:'SG-3184',c:'TC-3390728',n:'US-TT-品牌-强钩子素材',act:'上调 15%',cur:'¥10,000',nxt:'¥11,500',why:'CTR 1.8% 高于同组均值，利润 ROAS 1.18 在上升通道',cf:0.78,st:'待确认',tp:'up'},
+ {id:'SG-3185',c:'MC-7710955',n:'US-FB-再营销-加购未购',act:'维持',cur:'¥12,000',nxt:'¥12,000',why:'学习期第 6 天，不做结构性调整；利润 ROAS 2.88 已达标',cf:0.92,st:'待确认',tp:'keep'},
+ {id:'SG-3186',c:'MC-7710892',n:'US-IG-通投-18-34-兴趣',act:'暂停',cur:'¥26,000',nxt:'¥0',why:'回传中断导致 ROAS 不可信，先熔断止损再评估',cf:0.96,st:'待确认',tp:'pause'},
+ {id:'SG-3187',c:'GC-884331',n:'US-品牌词-精确匹配-01',act:'上调 12%',cur:'¥28,000',nxt:'¥31,360',why:'利润 ROAS 2.94，CTR 3.4%，品牌词仍有增量空间',cf:0.86,st:'待确认',tp:'up'}
+];
+/* 我的素材 */
+const MASET=[
+ {id:'CR-8842',n:'云顶帐篷 30s 达人切片',p:'TikTok Ads',f:'30s 竖版',c:'TC-3390611',sp:4260,ctr:'1.2%',cv:86,cpm:2.88,st:'待审核',risk:'文案「7 天可见干法」被判医疗功效暗示'},
+ {id:'CR-8836',n:'极境冲锋衣 15s 功能演示',p:'Meta',f:'15s 竖版',c:'MC-7710892',sp:12480,ctr:'2.4%',cv:214,cpm:1.42,st:'投放中',risk:''},
+ {id:'CR-8828',n:'溯山登山杖 UGC 合集',p:'TikTok Ads',f:'UGC 切片',c:'TC-3390611',sp:8640,ctr:'2.8%',cv:142,cpm:1.08,st:'投放中',risk:''},
+ {id:'CR-8798',n:'冲锋衣户外场景 15s',p:'Meta',f:'15s 横版',c:'MC-7710892',sp:10840,ctr:'2.1%',cv:168,cpm:1.24,st:'投放中',risk:''},
+ {id:'CR-8790',n:'帐篷空间展示 静态图组',p:'Meta',f:'轮播图',c:'MC-7711042',sp:4280,ctr:'1.4%',cv:64,cpm:0.96,st:'投放中',risk:''},
+ {id:'CR-8786',n:'羽绒睡袋 卖点口播',p:'Meta',f:'30s 竖版',c:'MC-7711042',sp:3240,ctr:'0.9%',cv:12,cpm:2.86,st:'已归档',risk:'判定医疗功效暗示，已归档并写黑名单'}
+];
+/* 我的告警 */
+const MALERT=[
+ {id:'AL-2201',t:'转化回传中断',p:'Meta',d:'MC-7710892 AddToCart 回传连续 42 分钟无到达',lv:'致命',st:'待处理',ts:'09:42',sp:24180},
+ {id:'AL-2192',t:'素材疑似违规待复核',p:'TikTok Ads',d:'CR-8842 被判医疗功效暗示，账户可能被限流',lv:'严重',st:'待处理',ts:'08:20',sp:4260},
+ {id:'AL-2195',t:'今日预算即将打满',p:'Meta + TikTok',d:'6 个活动今日消耗 ¥8.2万 / 预算 ¥9万',lv:'一般',st:'处理中',ts:'14:06',sp:0},
+ {id:'AL-2188',t:'预算连续上调被拦截',p:'Meta',d:'MC-7710955 6 小时内第 2 次上调预算，已被 RL-4102 阻断',lv:'提示',st:'已解决',ts:'昨天 17:42',sp:2640}
+];
+const MSKU=[
+ {id:'SKU-A1001',n:'极境 3 层冲锋衣 男款',cat:'冲锋衣',gm:0.38,sp:186400,pm:2.86,st:'投放中'},
+ {id:'SKU-A1042',n:'极境 3 层冲锋衣 女款',cat:'冲锋衣',gm:0.36,sp:164200,pm:2.72,st:'投放中'},
+ {id:'SKU-D4088',n:'旷野 徒步鞋 轻量款',cat:'徒步鞋',gm:0.21,sp:214600,pm:0.86,st:'待审核'},
+ {id:'SKU-B2001',n:'溯山 登山杖 碳纤维',cat:'登山杖',gm:0.62,sp:42600,pm:3.12,st:'投放中'},
+ {id:'SKU-C3042',n:'云顶 单人轻量帐篷',cat:'帐篷',gm:0.41,sp:98600,pm:1.42,st:'投放中'}
+];
+
+
+window.DRAWERS={
+ 'mcamp':()=>['我的活动 · MC-7710892 US-IG-通投-18-34-兴趣',
+   '<div class="kpis" style="margin-bottom:12px">'
+   +C.kpi({lb:'日预算',v:'¥26,000',foot:'今日已消耗 ¥24,180 · 93.0%',spark:1})
+   +C.kpi({lb:'利润 ROAS',v:'1.34',foot:'<span class="muted">GMV 口径 2.86</span>',hl:1,rule:'R2',ruleHow:'GMV 口径 2.86 看着不错，利润口径只有 1.34——差的这 1.52 全是成本。'})
+   +C.kpi({lb:'CPA',v:'¥112.86',foot:'<span class="tag warn">目标 ¥142</span>'})
+   +C.kpi({lb:'学习期',v:'已完成',foot:'<span class="tag ok">可自由调整</span>'})
+   +'</div>'
+   +C.panel('活动配置',C.kv([
+     ['活动 ID','<span class="mono">MC-7710892</span>'],
+     ['平台',ptag('Meta')],
+     ['账户','MA-7710442 栖岭-US-Meta-主账户'],
+     ['日预算','<b class="mono">¥26,000</b>'],
+     ['投放时段','全天投放'],
+     ['定向','18-34 岁 · 美国 / 加拿大 · 户外徒步兴趣'],
+     ['竞价','最大转化价值'],
+     ['学习期','<span class="tag ok">已完成（累计 1,284 次转化）</span>']
+   ]))
+   +'<div class="divider"></div>'
+   +C.note('bad','<b>回传中断中：</b>AddToCart 自 09:00 起无到达，已持续 42 分钟。这段时间消耗的 <b>¥24,180 没有产生任何可归因转化</b>。')
+   +C.panel('近 14 日消耗与利润 ROAS','<canvas data-achart="dual" data-seed="mc8892" data-h="150"></canvas>')
+   +C.anno('R6')
+   +'<div class="btn-row" style="margin-top:12px"><button class="btn p" data-act="pers-fix-postback">排查回传</button><button class="btn" data-act="pers-fuse">熔断止损</button></div>',
+   true],
+ 'suggest':()=>['调价建议 · SG-3186',
+   C.panel('建议概要',C.kv([
+     ['建议编号','<span class="mono">SG-3186</span>'],
+     ['目标活动','<span class="mono">MC-7710892</span> US-IG-通投-18-34-兴趣'],
+     ['建议动作','<span class="tag bad">暂停</span>'],
+     ['当前日预算','¥26,000'],
+     ['建议后','<b class="mono" style="color:var(--bad)">¥0（熔断）</b>'],
+     ['置信度','0.96'],
+     ['依据口径','<span class="tag ok">利润口径 · 统一归因 v3.2</span>'],
+     ['状态',C.st('待确认')]
+   ]))
+   +'<div class="divider"></div>'
+   +C.note('bad','建议依据：回传中断导致该活动的 ROAS 不可信，<b>继续按原预算投放等于用最贵的价格买无法归因的流量</b>。熔断后回传修复，再重新评估是否恢复。')
+   +C.panel('近 7 日表现',C.bm([['消耗','¥16.8万'],['利润 ROAS','1.34','var(--bad)'],['归因转化','486'],['CPA','¥112.86']]))
+   +C.anno('R7')
+   +'<div class="btn-row" style="margin-top:12px"><button class="btn p" data-act="pers-sg-confirm">确认执行</button><button class="btn" data-act="pers-sg-reject">不采纳</button></div>',
+   true],
+ 'malert':()=>['我的告警 · AL-2201 转化回传中断',
+   C.panel('告警概要',C.kv([
+     ['告警编号','<span class="mono">AL-2201</span>'],
+     ['类型',rtg('致命')+' 转化回传中断'],
+     ['影响活动','MC-7710892 US-IG-通投-18-34-兴趣'],
+     ['异常事件','AddToCart'],
+     ['首次触发','2026-10-12 09:42'],
+     ['持续时长','42 分钟'],
+     ['无归因消耗','<b class="mono" style="color:var(--bad)">¥24,180</b>'],
+     ['状态',C.st('待处理')]
+   ]))
+   +'<div class="divider"></div>'
+   +C.fs('处置顺序（不要跳步）')+C.stepper(['熔断止损','修回传链路','补回传数据','复盘归因'],0,['act','','',''])
+   +'<div class="divider"></div>'
+   +C.timeline([
+    {t:'09:42',d:'探活第 3 次失败，派发致命告警',cls:'bad',who:'规则 RL-4115'},
+    {t:'09:00',d:'AddToCart 回传量从 412/h 掉到 0/h',cls:'bad',who:'回传网关'},
+    {t:'08:30',d:'最后一次成功回传 1,204 条',cls:'ok',who:'回传网关'}
+   ])
+   +'<div class="divider"></div>'
+   +C.anno('R7','先止损再复盘：每拖 1 小时损失按比例放大，而复盘随时可以事后做。')
+   +'<div class="btn-row" style="margin-top:12px"><button class="btn p" data-act="pers-fuse">立即熔断</button><button class="btn" data-act="pers-fix-postback">排查回传</button></div>',
+   true],
+ 'masset':()=>['我的素材 · CR-8842 云顶帐篷 30s 达人切片',
+   C.panel('素材信息',C.kv([
+     ['素材编号','<span class="mono">CR-8842</span>'],
+     ['形式','30 秒竖版达人切片（9:16）'],
+     ['平台',ptag('TikTok Ads')],
+     ['关联活动','TC-3390611 US-TT-达人切片-爆量组'],
+     ['审核状态','<span class="tag warn">人工复核中</span>'],
+     ['疑似风险','文案「7 天可见干法」被判医疗功效暗示']
+   ]))
+   +'<div class="divider"></div>'
+   +C.panel('投放表现（近 7 天）',C.bm([['消耗','¥4,260'],['转化','86'],['CTR','1.2%'],['利润 ROAS','0.86','var(--bad)']]))
+   +C.note('warn','若复核判定违规，必须<b>下线 + 归档 + 写黑名单</b>三步同时做。只下线不归档，素材轮播半个月后会重新选中它，账户再次限流。')
+   +C.anno('R9')
+   +'<div class="btn-row" style="margin-top:12px"><button class="btn p" data-act="pers-asset-archive">下线并归档</button><button class="btn" data-act="pers-asset-pass">判定通过</button></div>',
+   true],
+ 'mconv':()=>['回传明细 · AddToCart',
+   C.panel('回传概况',C.kv([
+     ['事件','AddToCart'],
+     ['平台',ptag('Meta')+' + '+ptag('TikTok Ads')],
+     ['今日应回传','2,142 次'],
+     ['今日实回传','1,730 次'],
+     ['缺口','<b style="color:var(--bad)">412 次</b>（Meta 中断期间）'],
+     ['去重键','order_id'],
+     ['幂等状态','<span class="tag ok">无重复</span>']
+   ]))
+   +'<div class="divider"></div>'
+   +C.panel('分平台回传量（近 24 小时）','<canvas data-achart="bars" data-seed="pbme" data-h="150" data-n="24"></canvas>'
+    +'<div class="small muted" style="margin-top:6px">Meta 侧 09:00 后为 0</div>')
+   +C.anno('R6')
+   ,true]
+};
+
+
+window.ACT_EXTRA={};
+function formDlg(o){
+  DLGW=o.w||2;
+  showDlg(function(){return C.dlg({
+    t:o.t,tag:o.tag||'操作',tc:o.tc||'b',wide:o.w||2,sub:o.sub||'',
+    body:o.body,
+    foot:'<span class="fgrow small muted">'+esc(o.tip||'高频操作：一屏完成，无需等待审批')+'</span>'
+      +'<div class="fr"><button class="btn" data-act="close-modal">取消</button>'
+      +'<button class="btn p" data-act="'+o.act+'">'+(o.ok||'提交')+'</button></div>'
+  })});
+}
+function reqSubmit(msg,key){
+  key=key||'name';
+  if(!String(fsGet(key,'')||'').trim()){
+    toast('请先填写必填项','warn');
+    const m=document.querySelector('#modal');
+    if(m){m.classList.add('shake');setTimeout(function(){m.classList.remove('shake')},450)}
+    return;
+  }
+  dlgClose();toast(msg,'ok');
+}
+
+const FORMS={
+ 'pers-quick-budget':{t:'快速调整预算',tag:'高频',w:1,act:'pers-quick-budget-submit',ok:'应用',
+   sub:'单次上调不超过 30%，6 小时内不可二次上调',
+   body:function(){return C.mrow(C.fld('活动',C.tsel({opts:MC.map(function(c){return c.id+' '+c.n}),v:'MC-7710955 US-FB-再营销-加购未购',m:'name'})))
+   +C.mrow(C.fld('当前日预算',C.tinp({v:'12000',m:'cur',mono:true}))
+     +C.fld('调整为',C.tinp({v:'13200',m:'next',mono:true})))
+   +C.mnote('本次 <b>+10%</b>，在 30% 上限内。学习期内只允许同向、幅度 ≤20% 的微调。','g')
+   +C.prv([['调整前',fsGet('cur','')],['调整后',fsGet('next','')],['幅度','+10%'],['状态','学习期内允许']])
+  }},
+ 'pers-fix-postback':{t:'排查回传中断',tag:'高危',tc:'bad',act:'pers-fix-postback-submit',ok:'开始排查',
+   body:function(){return C.mrow(C.fld('活动',C.tsel({opts:['MC-7710892 US-IG-通投','MC-7711042 冷启组','TC-3390611 达人切片'],v:'MC-7710892 US-IG-通投',m:'name'}))
+      +C.fld('异常事件',C.tsel({opts:['AddToCart','InitiateCheckout','Purchase','全部事件'],v:'AddToCart',m:'ev'})))
+   +C.chk([{t:'回传网关连通性',cls:'ok'},{t:'平台 API 返回码',cls:'ok'},{t:'事件字典版本（须匹配 v3.2）',cls:'warn'},
+      {t:'order_id 幂等键是否冲突',cls:'warn'},{t:'账户令牌有效性',cls:'bad'},{t:'时区与日切分',cls:'warn'}],'ck','c2')
+   +C.mrow(C.fld('先熔断再排查',C.tsel({opts:['是，立即熔断','否，先排查'],v:'是，立即熔断',m:'fuse'}))
+      +C.fld('回补窗口',C.tsel({opts:['最近 2 小时','最近 24 小时','最近 7 天'],v:'最近 24 小时',m:'bk'})))
+   +C.mnote('熔断期间消耗的 ¥24,180 在回补后仍可归因；<b>不熔断则这部分消耗完全没有转化信号</b>。','r')
+  }},
+ 'pers-asset-new':{t:'上传素材',tag:'高频',w:1,act:'pers-asset-new-submit',ok:'提交上传',
+   body:function(){return C.fld('素材名称',C.tinp({ph:'如：帐篷空间展示 15s',m:'name'}),{req:true})
+   +C.mrow(C.fld('形式',C.tsel({opts:['15s 竖版','30s 竖版','静态图','轮播图','UGC 切片'],v:'15s 竖版',m:'fmt'}))
+     +C.fld('投放活动',C.tsel({opts:MC.slice(0,5).map(function(c){return c.id+' '+c.n}),v:'MC-7710892 US-IG-通投',m:'camp'})))
+   +C.fld('文案',C.tta({rows:2,ph:'避免绝对化用语与功效宣称',m:'copy'}))
+   +C.chk([{t:'无医疗功效宣称',cls:'ok'},{t:'无绝对化用语',cls:'ok'},{t:'图片音乐已授权',cls:'ok'},{t:'价格与实际一致',cls:'ok'}],'ck','c2')
+   +C.mnote('合规预检约 2 分钟，命中风险词会直接拦截。','y')
+  }},
+ 'pers-asset-archive':{t:'下线并归档素材',tag:'高危',tc:'bad',act:'pers-asset-archive-submit',ok:'确认归档',
+   body:function(){return C.panel('目标素材',C.kv([
+     ['素材','<span class="mono">CR-8842</span> 云顶帐篷 30s 达人切片'],
+     ['关联活动','TC-3390611 US-TT-达人切片-爆量组'],
+     ['当前消耗','¥4,260 / 日'],
+     ['疑似风险','文案「7 天可见干法」被判医疗功效暗示']
+   ]))
+   +C.mrow(C.fld('处置方式',C.tsel({opts:['下线 + 归档 + 写黑名单（推荐）','仅下线','继续投放'],v:'下线 + 归档 + 写黑名单（推荐）',m:'wp'}))
+     +C.fld('处置原因',C.tsel({opts:['文案功效暗示','平台判定违规','版权风险','素材质量不达标'],v:'文案功效暗示',m:'rs'})))
+   +C.mnote('<b>只下线不归档会被素材轮播重新选中</b>，账户再次限流，二次违规处罚通常是初次的数倍。','r')
+   +C.chk([{t:'同步下架全部关联广告',cls:'bad'},{t:'写入素材黑名单',cls:'ok'},{t:'归档保留 180 天可追溯',cls:'ok'}],'ck','c2')
+  }},
+ 'pers-asset-pass':{t:'素材复核结论',tag:'复核',w:1,act:'pers-asset-pass-submit',ok:'提交',
+   body:function(){return C.mrow(C.fld('复核结论',C.tsel({opts:['判定通过','修改文案后通过','判定违规并归档'],v:'修改文案后通过',m:'vd'}))
+     +C.fld('复核人',C.tsel({opts:['苏晓桐（本人）','周砚（经理）','何砚清（合规）'],v:'苏晓桐（本人）',m:'rv'})))
+   +C.fld('复核意见',C.tta({rows:2,ph:'说明判断依据，写入合规审计',m:'note'}))
+  }},
+ 'pers-sku-off':{t:'申请下架低毛利 SKU',tag:'核算',tc:'warn',w:1,act:'pers-sku-off-submit',ok:'提交申请',
+   body:function(){return C.panel('目标 SKU',C.kv([
+     ['SKU','<span class="mono">SKU-D4088</span> 旷野 徒步鞋 轻量款'],
+     ['毛利率','<span class="tag bad">21%</span>（类目底线 30%）'],
+     ['30 天消耗','¥21.46万'],
+     ['贡献利润','<span style="color:var(--bad)">−¥1.86万</span>']
+   ]))
+   +C.mnote('这个 SKU 用店铺均值 51% 算会显示为「盈利」；按 <b>SKU 真实毛利 21%</b> 算，它是净亏损。','r')
+   +C.mrow(C.fld('申请动作',C.tsel({opts:['从我的活动中排除','申请全量下架','仅暂停广告'],v:'从我的活动中排除',m:'ap'}))
+     +C.fld('预算去向',C.tsel({opts:['释放到同活动其他 SKU','释放到我的其他活动','不释放'],v:'释放到同活动其他 SKU',m:'rel'})))
+   +C.chk([{t:'同步重算活动利润 ROAS',cls:'ok'},{t:'通知电商与采购',cls:'warn'},{t:'历史订单保留可追溯',cls:'ok'}],'ck','c2')
+  }},
+ 'pers-ab-new':{t:'新建 A/B 测试',tag:'实验',act:'pers-ab-new-submit',ok:'创建测试',
+   body:function(){return C.mrow(C.fld('测试名称',C.tinp({ph:'如：冲锋衣卖点测试',m:'name'}),{req:true})
+     +C.fld('活动',C.tsel({opts:MC.map(function(c){return c.id+' '+c.n}),v:'MC-7710892 US-IG-通投',m:'camp'})))
+   +C.mrow(C.fld('变量',C.tsel({opts:['素材','文案','受众','落地页'],v:'素材',m:'var'}))
+     +C.fld('主要指标',C.tsel({opts:['CTR','CVR','CPA','利润 ROAS'],v:'CVR',m:'mt'})))
+   +C.mrow(C.fld('每组流量占比',C.rng({lb:'单组流量',k:'traf',min:10,max:50,step:10,v:30,disp:'30',suf:'%'}))
+     +C.fld('最少转化数',C.rng({lb:'每组最少转化',k:'cv',min:20,max:300,step:20,v:100,disp:'100',suf:' 次'})))
+   +C.chk([{t:'测试期预算固定不变',d:'预算变动会污染结论',cls:'ok'},{t:'排除学习期活动',cls:'bad'},{t:'置信度不足不判胜负',cls:'ok'},{t:'结束后自动归档落选素材',cls:'warn'}],'ck','c2')
+   +C.mnote('<b>学习期活动不能做 A/B 测试</b>：测试期的预算与结构变动会让模型清零重学，结论也不可信。','r')
+  }},
+ 'pers-note':{t:'写一条工作记录',tag:'协同',w:1,act:'pers-note-submit',ok:'提交',
+   body:function(){return C.fld('记录标题',C.tinp({ph:'如：10-12 回传中断处置',m:'name'}),{req:true})
+   +C.mrow(C.fld('关联对象',C.tsel({opts:['AL-2201 回传中断','MC-7710892','CR-8842 素材','今日投放日报'],v:'AL-2201 回传中断',m:'obj'}))
+     +C.fld('类型',C.tsel({opts:['处置记录','复盘结论','交接说明','异常上报'],v:'处置记录',m:'tp'})))
+   +C.fld('正文',C.tta({rows:4,ph:'写清判断依据、动作与结果，便于后续复盘',m:'body'}))
+  }},
+ 'pers-pref-set':{t:'个人偏好设置',tag:'设置',w:2,act:'pers-pref-set-submit',ok:'保存',
+   body:function(){return C.fs('工作台')
+   +C.mrow(C.fld('默认落地页',C.tsel({opts:['我的投放驾驶舱','我的告警','今日投放'],v:'我的投放驾驶舱',m:'home'}))
+     +C.fld('刷新频率',C.tsel({opts:['实时（30 秒）','1 分钟','5 分钟'],v:'1 分钟',m:'iv'})))
+   +C.fs('告警与通知')
+   +C.chk([{t:'回传断流 → 立即推送',cls:'bad'},{t:'预算熔断拦截 → 推送',cls:'warn'},{t:'素材合规命中 → 推送',cls:'warn'},
+      {t:'日常报表 → 每日 09:00 汇总',cls:'ok'},{t:'绩效周报 → 每周一',cls:'ok'}],'nt','c2')
+   +C.fs('调价建议')
+   +C.mrow(C.fld('默认动作',C.tsel({opts:['只提醒，我自己确认','低于置信度 0.9 自动执行','全部自动执行'],v:'只提醒，我自己确认',m:'au'}))
+     +C.fld('建议频次',C.tsel({opts:['每小时','每 3 小时','每天 09:00'],v:'每 3 小时',m:'fq'})))
+   +C.mnote('自动执行只对置信度 ≥0.90 且幅度 ≤10% 的建议生效；涉及学习期活动一律不自动执行。','y')
+  }},
+ 'perf-note':{t:'提交绩效自评',tag:'绩效',w:2,act:'perf-note-submit',ok:'提交自评',
+   body:function(){return C.mrow(C.fld('自评周期',C.tsel({opts:['本周（W42）','本月（10 月）','本季度（Q4）'],v:'本周（W42）',m:'pd'}))
+     +C.fld('自评等级',C.tsel({opts:['超额完成','达成目标','部分达成','未达成'],v:'达成目标',m:'lv'})))
+   +'<div class="span2">'+C.fld('关键成果',C.tta({rows:4,ph:'用数据说明：如把 MC-7711042 的 CPA 从 ¥242 降到 ¥168',m:'ach'}))+'</div>'
+   +C.chk([{t:'利润 ROAS 提升',cls:'ok'},{t:'回传稳定性改善',cls:'ok'},{t:'素材迭代效率提升',cls:'ok'},{t:'学习期 CPA 下降',cls:'warn'},{t:'无重大止损遗漏',cls:'bad'}],'ck','c2')
+   +C.mnote('绩效按<b>利润口径</b>计分。用 GMV 口径自评会高估成绩，也会在复盘时被质疑。','r')
+  }}
+};
+
+Object.keys(FORMS).forEach(function(k){
+  const f=FORMS[k];
+  window.ACT_EXTRA[k]=function(){formDlg({t:f.t,tag:f.tag,tc:f.tc,sub:f.sub,w:f.w,act:f.act,ok:f.ok,body:f.body()})};
+  window.ACT_EXTRA[k+'-submit']=function(){reqSubmit(f.ok+'成功','name')};
+});
+
+window.ACT_EXTRA['pers-sg-confirm']=function(){toast('SG-3186 已执行 · MC-7710892 已熔断，消耗停止；回传修复后可一键恢复','ok')};
+window.ACT_EXTRA['pers-sg-reject']=function(){toast('已标记为「不采纳」· 该活动本次不调整，理由将用于校准建议模型','warn')};
+window.ACT_EXTRA['pers-fuse']=function(){
+  DLGW=1;showDlg(function(){return C.dlg({
+    t:'熔断止损',tag:'高危',tc:'bad',wide:1,sub:'熔断后消耗立即停止，恢复需手动确认',
+    body:C.panel('目标',C.kv([
+      ['活动','<span class="mono">MC-7710892</span> US-IG-通投-18-34-兴趣'],
+      ['当前日预算','¥26,000'],
+      ['今日已消耗','¥24,180'],
+      ['无归因消耗','<span style="color:var(--bad)">¥24,180（回传中断期间）</span>']
+    ]))
+    +C.fld('熔断原因',C.tta({rows:2,ph:'回传中断，ROAS 不可信，先止损',m:'name'}))
+    +C.chk([{t:'同时暂停关联广告组',cls:'bad'},{t:'排除其他 5 个活动',d:'仅熔断问题活动',cls:'ok'},{t:'保留历史报表可重算',cls:'ok'},{t:'恢复需手动确认',d:'防止自动恢复循环',cls:'warn'}],'ck','c2')
+    +C.mnote('处置顺序：<b>熔断止损 → 修回传 → 补数据 → 复盘</b>。不要跳步，也不要先复盘再处置。','r')
+    ,foot:'<span class="fgrow"></span><div class="fr"><button class="btn" data-act="close-modal">取消</button><button class="btn p" data-act="pers-fuse-ok">确认熔断</button></div>'
+  })});
+};
+window.ACT_EXTRA['pers-fuse-ok']=function(){dlgClose();toast('MC-7710892 已熔断 · 消耗停止，无归因损失不再扩大','ok')};
+window.ACT_EXTRA['pers-ai']=function(){
+  openDrawer('✦ 投放助手',
+    C.chat([
+      {who:'user',t:'我今天该先做什么？'},
+      {who:'ai',t:'就三件事：<br><b>1）熔断 MC-7710892</b>——回传断了 42 分钟，已烧掉 ¥24,180 无归因。不熔断的话每分钟都在多烧钱；<br><b>2）处理 CR-8842</b>——被判医疗功效暗示，如果复核不过，必须「下线 + 归档」，只下线的话半个月后素材轮播会把它选回来，账户再限流一次；<br><b>3）确认 6 条调价建议</b>——其中「MC-7711042 下调 40%」利润 ROAS 只有 0.74，是最该执行的一条。'}
+    ])
+    +'<div class="divider"></div>'
+    +C.chk([{t:'熔断 MC-7710892 并排查回传',cls:'bad'},{t:'归档 CR-8842 违规素材',cls:'warn'},{t:'采纳「冷启组下调 40%」建议',cls:'ok'}],'pfix','c1')
+    +'<div class="btn-row" style="margin-top:12px"><button class="btn p" data-act="pers-fuse">立即熔断</button><button class="btn" data-act="close-drawer">仅记录</button></div>'
+    +'<div style="display:flex;gap:9px;margin-top:12px"><input class="inp" style="flex:1" placeholder="继续追问…"><button class="btn p" data-act="pers-ai-more">发送</button></div>',true);
+};
+window.ACT_EXTRA['pers-ai-more']=function(){toast('已追问 · 利润口径与 GMV 口径的差异见「我的效果核算」页','ok')};
+window.ACT_EXTRA['pers-alert-handle']=function(){formDlg(FORMS['pers-fix-postback'])};
+window.ACT_EXTRA['sg-open']=function(){openDrawer('调价建议 · 6 条待确认',
+  C.note('warn','建议均按<b>利润口径</b>生成。执行前请确认该活动<b>不在学习期</b>，且单次上调不超过 30%。')
+  +'<div class="divider"></div>'
+  +C.table([
+    {t:'编号',k:'id',mono:1},
+    {t:'活动',k:'n'},
+    {t:'建议',f:function(r){return '<span class="tag '+(r.tp==='down'?'bad':(r.tp==='up'?'ok':(r.tp==='pause'?'bad':'')))+'">'+esc(r.act)+'</span>'}},
+    {t:'当前预算',r:1,mono:1,k:'cur'},
+    {t:'建议后',r:1,mono:1,k:'nxt'},
+    {t:'置信度',r:1,mono:1,k:'cf'},
+    {t:'状态',f:function(r){return C.st(r.st)}}
+  ],MSUG)
+  +'<div class="btn-row" style="margin-top:12px"><button class="btn p" data-act="pers-sg-confirm">采纳全部</button><button class="btn" data-act="close-drawer">稍后处理</button></div>',true)};
+window.ACT_EXTRA['pers-pace-save']=function(){formDlg({
+  t:'调整投放节奏',tag:'高频',w:1,act:'pers-pace-save-submit',ok:'保存节奏',
+  body:C.mrow(C.fld('节奏模式',C.tsel({opts:['保持当前','按转化曲线','均衡分配'],v:'按转化曲线',m:'name'}))
+    +C.fld('作用范围',C.tsel({opts:['我的 6 个活动','仅 Meta 3 个','仅 TikTok 2 个'],v:'我的 6 个活动',m:'sc'})))
+  +C.rng({lb:'日间消耗占比',k:'day',min:50,max:90,step:5,v:72,disp:'72',suf:'%'})
+  +C.mnote('调整节奏<b>只改时段分配、不改日预算总额</b>，因此不会触发 30% 上调熔断。','y')
+})};
+window.ACT_EXTRA['pers-pace-save-submit']=function(){reqSubmit('节奏已保存 · 明日起按新曲线分配时段','name')};
+window.ACT_EXTRA['pers-camp-edit']=function(){formDlg({
+  t:'编辑活动设置',tag:'高频',w:2,act:'pers-camp-edit-submit',ok:'保存修改',
+  sub:'学习期活动仅允许预算微调，结构性修改会被拦截',
+  body:C.mrow(C.fld('活动',C.tsel({opts:MC.map(function(c){return c.id+' '+c.n}),v:'MC-7710892 US-IG-通投',m:'name'}))
+    +C.fld('投放时段',C.tsel({opts:['全天投放','07:00-23:00','按转化曲线'],v:'按转化曲线',m:'sch'})))
+  +C.mrow(C.fld('日预算',C.tinp({v:'26000',m:'bud',mono:true}))
+    +C.fld('竞价系数（再营销）',C.tinp({v:'140',m:'coef',mono:true})))
+  +C.panel('护栏校验',C.pgrp([['单次预算调整幅度',84,'ok','+10%'],['距上次调整',92,'ok','18 小时'],['学习期限制',100,'ok','可改'],['批量调价审批',100,'ok','单活动']]))
+  +C.mnote('若该活动处于<b>学习期</b>，定向与出价策略的修改会被 RL-4108 直接拦截：结构性改动会让模型清零重学，实测 CPA 反升 30%。','y')
+})};
+window.ACT_EXTRA['pers-camp-edit-submit']=function(){reqSubmit('活动设置已保存 · 变更已写入操作日志','name')};
+window.ACT_EXTRA['pers-roi-set']=function(){formDlg({
+  t:'我的核算视图',tag:'设置',w:1,act:'pers-roi-set-submit',ok:'保存',
+  body:C.mrow(C.fld('默认主指标',C.tsel({opts:['利润 ROAS（推荐）','GMV ROAS（仅参考）'],v:'利润 ROAS（推荐）',m:'name'}))
+      +C.fld('GMV ROAS 展示',C.tsel({opts:['置灰，仅作参考','正常展示'],v:'置灰，仅作参考',m:'gmv'})))
+    +C.mrow(C.fld('是否展示退款冲减',C.tsel({opts:['展示','不展示'],v:'展示',m:'rf'}))
+      +C.fld('SKU 利润粒度',C.tsel({opts:['SKU 级真实毛利','品类均值'],v:'SKU 级真实毛利',m:'sku'})))
+    +C.mnote('默认主指标必须是<b>利润口径</b>。用 GMV 口径做默认视图，会让自己在不知不觉中按虚高数据加预算。','r')
+})};
+window.ACT_EXTRA['pers-roi-set-submit']=function(){reqSubmit('核算视图已保存 · 默认主指标为利润 ROAS','name')};
+window.ACT_EXTRA['pers-rule-new']=function(){formDlg({
+  t:'提交一条止损申请',tag:'申请',w:1,act:'pers-rule-new-submit',ok:'提交申请',
+  body:C.mrow(C.fld('申请标题',C.tinp({ph:'如：冷启组加预算熔断',m:'name'}),{req:true})
+    +C.fld('活动',C.tsel({opts:MC.map(function(c){return c.id+' '+c.n}),v:'MC-7711042 US-FB-冷启组',m:'camp'})))
+  +C.mrow(C.fld('触发条件',C.tsel({opts:['利润 ROAS < 1.0','CPA 超类目上限 50%','小时消耗超日预算 240%','回传成功率 < 95%'],v:'利润 ROAS < 1.0',m:'cd'}))
+    +C.fld('动作',C.tsel({opts:['自动暂停','告警','预算下调 40%'],v:'自动暂停',m:'act2'})))
+  +C.mnote('申请会进入经理审批队列。<b>暂停类动作生效后不自动恢复</b>，需手动确认。','y')
+})};
+window.ACT_EXTRA['pers-rule-new-submit']=function(){reqSubmit('止损申请已提交 · 经理审批队列，预计 30 分钟内回复','name')};
+window.ACT_EXTRA['pers-export']=function(){toast('导出任务已创建 · 完成后通知中心推送下载链接','ok')};
+window.ACT_EXTRA['pers-refresh']=function(){toast('已刷新 · 最近同步 '+nowTime().slice(11,16)+' · 回传延迟 4 分钟内','ok')};
+
+['close-modal','close-drawer','fchk','fset','flist','frng','theme','rule-toggle','bell','bell-all','bell-read','palette','fold','ftab','tab','flag','search','login','do-login'].forEach(function(a){
+  if(!window.ACT_EXTRA[a])window.ACT_EXTRA[a]=function(){};
+});
+
+
+window.PAL_EXTRA=[
+ {t:'熔断 MC-7710892 并止损',k:'快捷操作 › 止损',i:'⛔',act:'pers-fuse'},
+ {t:'排查 AddToCart 回传中断',k:'快捷操作 › 回传',i:'⇄',act:'pers-fix-postback'},
+ {t:'快速调整活动预算',k:'快捷操作 › 预算',i:'¥',act:'pers-quick-budget'},
+ {t:'上传新素材',k:'快捷操作 › 素材',i:'▣',act:'pers-asset-new'},
+ {t:'申请下架低毛利 SKU',k:'快捷操作 › 核算',i:'※',act:'pers-sku-off'}
+];
+
+
+V.pers_home={t:'我的投放驾驶舱',render(){
+  return C.pagehead('我的投放驾驶舱','苏晓桐 · Meta & TikTok 6 个活动 · ' + nowTime().slice(11,16) + ' 更新',
+    '<button class="btn p" data-act="pers-fuse">⛔ 熔断</button><button class="btn" data-act="pers-quick-budget">调预算</button><button class="btn" data-act="pers-ai">✦ 助手</button>')
+  +C.note('bad','<b>先处理这个：</b>MC-7710892 的 AddToCart 回传已中断 <b>42 分钟</b>，期间消耗 <b>¥24,180 没有产生任何可归因转化</b>，但平台仍在按日预算继续花钱。处置顺序：<b>熔断 → 修回传 → 补数据 → 复盘</b>。')
+  +krow([
+    {lb:'今日我的消耗',v:'¥8.2万',foot:'<span class="tag warn">+14.2%</span> 同比昨日',spark:1,sparkUp:1,hl:1},
+    {lb:'今日预算',v:'¥9.0万',foot:'<span class="tag warn">已用 91.1%</span>'},
+    {lb:'利润 ROAS',v:'1.62',foot:'<span class="muted">GMV 口径 3.24</span>',rule:'R2',ruleHow:'GMV 口径 3.24 看着还行，利润口径只有 1.62。按 GMV 加预算就是在放大亏损。'},
+    {lb:'待我处理',v:'4',foot:'<span class="tag bad">1 条致命</span>',spark:1,sparkUp:0},
+    {lb:'调价建议',v:'6',foot:'<span class="tag warn">3 条建议下调</span>',spark:1},
+    {lb:'学习期活动',v:'3',foot:'<span class="tag warn">只能微调</span>',rule:'R4',ruleHow:'学习期内改结构会让模型清零重学，实测 CPA 反升 30%。'}
+  ])
+  +'<div class="grid2">'
+  +C.panel('我的活动消耗与利润 ROAS（近 14 天）','<canvas data-achart="dual" data-seed="mytrend" data-h="176"></canvas>',{sub:'柱为消耗 · 线为利润 ROAS'})
++C.panel('我的消耗构成','<canvas data-achart="donut" data-h="176" data-center="¥8.2万" data-sub="今日消耗" data-data=\'[ {"v":38},{"v":24},{"v":18},{"v":12},{"v":8}]\'></canvas>'
+    +C.legend([['US-IG-通投（Meta）','#1877f2'],['US-FB-再营销（Meta）','#4f6cff'],['US-FB-冷启（Meta）','#f2a93b'],['US-TT-达人（TikTok）','#25f4ee'],['US-品牌词（Google）','#37b3a4']]))
+  +'</div>'
+  +sec('要我现在处理','按紧急度排序')
+  +C.panel('',C.table([
+    {t:'事项',f:function(r){return rtg(r.lv)+' '+esc(r.n)}},
+    {t:'对象',k:'obj'},
+    {t:'影响',r:1,mono:1,k:'amt'},
+    {t:'截止',k:'dl',mono:1},
+    {t:'操作',f:function(r){return '<span class="link" data-act="'+r.act+'">'+esc(r.op)+'</span>'}}
+  ],[{lv:'致命',n:'回传中断 42 分钟，需立即熔断',obj:'MC-7710892',amt:'¥24,180',dl:'立即',op:'熔断',act:'pers-fuse'},
+     {lv:'严重',n:'素材疑似违规，需复核处置',obj:'CR-8842',amt:'¥4,260/日',dl:'今日 12:00',op:'去处理',act:'pers-asset-archive'},
+     {lv:'一般',n:'冷启组利润 ROAS 0.74，建议下调 40%',obj:'MC-7711042',amt:'¥8,000/日',dl:'今日 18:00',op:'看建议',act:'sg-open'},
+     {lv:'一般',n:'低毛利 SKU 持续亏损，建议排除',obj:'SKU-D4088',amt:'¥21.46万',dl:'本周内',op:'去申请',act:'pers-sku-off'}],{rowlink:1}))
+  +C.anno('R6')+C.anno('R7');
+}};
+
+V.pers_today={t:'今日投放',render(){
+  return C.pagehead('今日投放','我的 6 个活动 · 逐小时消耗与预算执行',
+    '<button class="btn p" data-act="pers-quick-budget">调预算</button><button class="btn" data-act="pers-pace-save">调节奏</button>')
+  +krow([
+    {lb:'今日消耗',v:'¥8.2万',foot:'<span class="tag ok">执行率 91.1%</span>',spark:1,sparkUp:1,hl:1},
+    {lb:'今日成交',v:'¥41.2万',foot:'成交 186 单'},
+    {lb:'转化数',v:'486',foot:'加购 1,024 · 成交 486'},
+    {lb:'今日利润',v:'¥13.3万',foot:'利润 ROAS 1.62'},
+    {lb:'剩余预算',v:'¥0.8万',foot:'<span class="tag warn">预计 16:00 前打满</span>'}
+  ])
+  +'<div class="grid2">'
+  +C.panel('我的分小时消耗（万元）','<canvas data-achart="bars" data-seed="myhour" data-h="170" data-n="24"></canvas>')
++C.panel('6 个活动预算执行','<canvas data-achart="hbars" data-h="170" data-data=\'[ ["US-IG-通投",93],["US-FB-再营销",82],["US-FB-冷启",99],["US-TT-达人",99],["US-TT-品牌",86],["US-品牌词",94]]\'></canvas>')
+  +'</div>'
+  +C.panel('我的活动今日明细',C.table([
+    {t:'活动',f:function(r){return '<b>'+esc(r.n)+'</b>'}},
+    {t:'平台',f:function(r){return ptag(r.p)}},
+    {t:'日预算',r:1,mono:1,f:function(r){return money(r.bud)}},
+    {t:'今日消耗',r:1,mono:1,f:function(r){return money(r.sp)}},
+    {t:'执行率',r:1,f:function(r){return C.progress(Math.min(100,r.sp/r.bud*100),r.sp/r.bud>0.95?'bad':(r.sp/r.bud>0.8?'warn':'ok'))}},
+    {t:'利润 ROAS',r:1,f:function(r){return roas(r.pm)}},
+    {t:'学习期',f:function(r){return r.lr==='已完成'?'<span class="muted">—</span>':'<span class="tag warn">'+esc(r.lr)+'</span>'}},
+    {t:'详情',f:function(){return '<span class="link" data-open="mcamp">打开</span>'}}
+  ],MC,{rowlink:1}))
+  +C.note('warn','<b>冷启组与达人组执行率已达 99%</b>，今天基本打满。冷启组利润 ROAS 仅 0.74，<b>继续加预算就是放大亏损</b>。')
+  +C.anno('R8');
+}};
+
+V.pers_alert={t:'我的告警',render(){
+  return C.pagehead('我的告警','只显示与我负责活动相关的告警',
+    '<button class="btn p" data-act="pers-alert-handle">处理最紧急</button><button class="btn" data-act="pers-refresh">重新探活</button>')
+  +krow([
+    {lb:'待处理',v:'2',foot:'致命 1 · 严重 1',hl:1,spark:1,sparkUp:0},
+    {lb:'今日新增',v:'2',foot:'<span class="tag warn">较昨日 +1</span>'},
+    {lb:'无归因消耗',v:'¥24,180',foot:'<span class="tag bad">回传中断期间</span>',rule:'R6',ruleHow:'这部分消耗完全没有转化信号，却照样在烧。'},
+    {lb:'平均响应',v:'18 min',foot:'<span class="tag ok">SLA 30 分钟</span>'},
+    {lb:'本周已解决',v:'14',foot:'<span class="muted">平均 22 分钟</span>'}
+  ])
+  +C.note('bad','<b>处置顺序不要跳步：</b>① 熔断止损 ② 修回传链路 ③ 补回传数据 ④ 复盘归因。回传断了每拖 1 小时损失按比例放大，而复盘随时可以事后做。')
+  +C.panel('我的告警列表',C.table([
+    {t:'编号',k:'id',mono:1},
+    {t:'类型',f:function(r){return rtg(r.lv)+' '+esc(r.t)}},
+    {t:'平台',f:function(r){return ptag(r.p)}},
+    {t:'说明',k:'d'},
+    {t:'影响金额',r:1,mono:1,f:function(r){return r.sp?money(r.sp):'<span class="muted">—</span>'}},
+    {t:'触发',k:'ts',mono:1},
+    {t:'状态',f:function(r){return C.st(r.st)}},
+    {t:'操作',f:function(){return '<span class="link" data-open="malert">处理</span>'}}
+  ],MALERT,{rowlink:1}))
+  +'<div class="grid2" style="margin-top:12px">'
+  +C.panel('告警趋势（近 14 天）','<canvas data-achart="bars" data-seed="myal" data-h="164" data-n="14"></canvas>')
+  +C.panel('本周处置记录',C.timeline([
+    {t:'10-11 17:42',d:'MC-7710955 预算连续上调被 RL-4102 拦截',cls:'warn',who:'规则引擎'},
+    {t:'10-10 14:20',d:'CR-8786 素材判定违规，已下线并归档',cls:'',who:'苏晓桐'},
+    {t:'10-09 11:35',d:'TC-3390728 频次超 9 次，已调低出价系数',cls:'',who:'苏晓桐'},
+    {t:'10-08 16:02',d:'MC-7711042 回传短时抖动，30 秒自恢复',cls:'ok',who:'回传网关'}
+  ]))
+  +'</div>'
+  +C.anno('R7');
+}};
+
+V.pers_task={t:'我的待办',render(){
+  return C.pagehead('我的待办','3 项待处理 · 含调价建议确认与合规处置',
+    '<button class="btn p" data-act="pers-rule-new">提交止损申请</button><button class="btn" data-act="pers-note">写记录</button>')
+  +krow([
+    {lb:'待办总数',v:'3',foot:'<span class="tag bad">1 项今日到期</span>',spark:1,hl:1},
+    {lb:'调价建议待确认',v:'6',foot:'<span class="tag warn">3 条建议下调</span>'},
+    {lb:'合规待复核',v:'1',foot:'CR-8842'},
+    {lv:'',lb:'本周已完成',v:'22',foot:'<span class="muted">较上周 +4</span>'}
+  ])
+  +C.panel('待办清单',C.table([
+    {t:'待办',f:function(r){return '<b>'+esc(r.n)+'</b>'}},
+    {t:'类型',f:function(r){return '<span class="tag '+(r.lv==='致命'?'bad':'warn')+'">'+esc(r.tp)+'</span>'}},
+    {t:'对象',k:'obj'},
+    {t:'金额影响',r:1,mono:1,k:'amt'},
+    {t:'截止',k:'dl',mono:1},
+    {t:'优先级',f:function(r){return rtg(r.pr)}},
+    {t:'操作',f:function(r){return '<span class="link" data-act="'+r.act+'">'+esc(r.op)+'</span>'}}
+  ],[{n:'熔断 MC-7710892（回传中断）',tp:'止损',obj:'MC-7710892',amt:'¥24,180',dl:'立即',pr:'致命',op:'去熔断',act:'pers-fuse'},
+     {n:'确认 6 条调价建议',tp:'调价',obj:'我的 6 个活动',amt:'影响 ¥1.8万/日',dl:'今日 18:00',pr:'高',op:'去看建议',act:'sg-open'},
+     {n:'CR-8842 素材合规复核',tp:'合规',obj:'CR-8842',amt:'¥4,260/日',dl:'今日 12:00',pr:'高',op:'去处理',act:'pers-asset-archive'}],{rowlink:1}))
+  +'<div class="grid2" style="margin-top:12px">'
+  +C.panel('待办类型分布','<canvas data-achart="donut" data-h="164" data-center="3" data-sub="待办" data-data=\'[{"v":40},{"v":34},{"v":26}]\'></canvas>'
+    +C.legend([['止损','#ef5f6b'],['调价','#4f6cff'],['合规','#f2a93b']]))
+  +C.panel('本周完成情况',C.pgrp([['调价建议确认',92,'ok','18 条'],['告警处置',100,'ok','14 条'],['素材迭代',64,'warn','6 条'],['A/B 测试',48,'warn','2 个']]))
+  +'</div>';
+}};
+
+V.pers_camp={t:'我的广告活动',render(){
+  return C.pagehead('我的广告活动','6 个活动 · 日预算合计 ¥11.1万',
+    '<button class="btn p" data-act="pers-camp-edit">编辑活动</button><button class="btn" data-act="pers-quick-budget">调预算</button>')
+  +krow([
+    {lb:'我负责的活动',v:'6',foot:'Meta 3 · TikTok 2 · Google 1',spark:1},
+    {lb:'日预算合计',v:'¥11.1万',foot:'今日已用 ¥8.2万'},
+    {lb:'加权利润 ROAS',v:'1.62',foot:'<span class="muted">GMV 3.24</span>',rule:'R2',ruleHow:'GMV 与利润口径差 1.62 倍，按 GMV 加预算会放大亏损。'},
+    {lb:'学习期活动',v:'3',foot:'<span class="tag warn">只能微调</span>',rule:'R4',ruleHow:'学习期内改结构会让模型清零重学，CPA 反升约 30%。'},
+    {lb:'受限 / 需关注',v:'1',foot:'TC-3390611 素材受限'}
+  ])
+  +C.panel('活动清单',C.tbar('<input class="inp" placeholder="搜索我的活动…"><button class="btn sm" data-act="pers-refresh">刷新</button><span class="sp"></span>')+C.table([
+    {t:'活动',f:function(r){return '<b>'+esc(r.n)+'</b><div class="small muted mono">'+esc(r.id)+'</div>'}},
+    {t:'平台',f:function(r){return ptag(r.p)}},
+    {t:'类型',k:'ty'},
+    {t:'日预算',r:1,mono:1,f:function(r){return money(r.bud)}},
+    {t:'今日消耗',r:1,mono:1,f:function(r){return money(r.sp)}},
+    {t:'利润 ROAS',r:1,f:function(r){return roas(r.pm)}},
+    {t:'CPA',r:1,mono:1,f:function(r){return money(r.cpa)}},
+    {t:'CTR',r:1,mono:1,f:function(r){return r.ctr+'%'}},
+    {t:'学习期',f:function(r){return r.lr==='已完成'?'<span class="muted">—</span>':'<span class="tag warn">'+esc(r.lr)+' '+r.lv+'/50</span>'}},
+    {t:'操作',f:function(){return '<span class="link" data-open="mcamp">详情</span> <span class="link" data-act="pers-camp-edit">编辑</span>'}}
+  ],MC,{rowlink:1}))
+  +C.note('info','<b>学习期活动只允许同向、幅度 ≤20% 的预算微调。</b>改定向、改出价策略、加删广告组都会让模型清零重学，规则会直接拦截。')
+  +C.anno('R5')+C.anno('R10');
+}};
+
+V.pers_bid={t:'我的调价建议',render(){
+  return C.pagehead('我的调价建议','系统按利润口径生成 · 6 条待确认',
+    '<button class="btn p" data-act="pers-sg-confirm">批量采纳</button><button class="btn" data-act="pers-pref-set">建议设置</button>')
+  +C.note('warn','建议均按<b>利润口径</b>生成。注意：<b>MC-7710955 还在学习期</b>，建议是「维持」——学习期内不该加预算，也不该改结构。')
+  +krow([
+    {lb:'待确认建议',v:'6',foot:'<span class="tag warn">3 条下调</span>',spark:1},
+    {lb:'建议影响金额',v:'¥1.8万/日',foot:'净下调 ¥0.9万/日'},
+    {lb:'平均置信度',v:'0.87',foot:'阈值 0.80'},
+    {lb:'本周采纳率',v:'68%',foot:'<span class="muted">24 条中采纳 16</span>'},
+    {lb:'被护栏拦截',v:'1',foot:'<span class="tag warn">超 30% 上限</span>'}
+  ])
+  +C.panel('调价建议清单',C.table([
+    {t:'编号',k:'id',mono:1},
+    {t:'活动',f:function(r){return '<b>'+esc(r.n)+'</b>'}},
+    {t:'建议',f:function(r){return '<span class="tag '+(r.tp==='down'?'bad':(r.tp==='up'?'ok':(r.tp==='pause'?'bad':'')))+'">'+esc(r.act)+'</span>'}},
+    {t:'当前预算',r:1,mono:1,k:'cur'},
+    {t:'建议后',r:1,mono:1,f:function(r){return '<b>'+esc(r.nxt)+'</b>'}},
+    {t:'依据',k:'why'},
+    {t:'置信度',r:1,f:function(r){return C.progress(r.cf*100,r.cf>=0.9?'ok':'warn')+'<span class="small mono">'+r.cf.toFixed(2)+'</span>'}},
+    {t:'操作',f:function(){return '<span class="link" data-open="suggest">详情</span>'}}
+  ],MSUG,{rowlink:1}))
+  +'<div class="grid2" style="margin-top:12px">'
+  +C.panel('我的利润 ROAS 与目标线','<canvas data-achart="dual" data-seed="myroas" data-h="168"></canvas>'
+    +'<div class="small muted" style="margin-top:6px">目标线 2.10 · 我负责的 6 个活动中 4 个未达标</div>')
+  +C.panel('建议执行原则',C.chk([
+    {t:'先止损：利润 ROAS &lt; 1.0 的活动优先下调或暂停',cls:'bad'},
+    {t:'学习期活动一律「维持」，不加不减',d:'结构与预算调整都会重学',cls:'ok'},
+    {t:'单次上调不超过 30%，6 小时内不二次上调',cls:'warn'},
+    {t:'上调前必须看 SKU 级毛利，不能只看 ROAS 表面值',cls:'warn'},
+    {t:'数据不可信时不采纳（如回传中断期间）',cls:'bad'}
+  ],'pr','c1'))
+  +'</div>'
+  +C.anno('R4')+C.anno('R5')+C.anno('R2');
+}};
+
+V.pers_pace={t:'今日分时消耗',render(){
+  return C.pagehead('今日分时消耗','我的消耗曲线 · 与转化高峰的匹配度',
+    '<button class="btn p" data-act="pers-pace-save">调整节奏</button><button class="btn" data-act="pers-export">导出</button>')
+  +krow([
+    {lb:'今日消耗',v:'¥8.2万',foot:'<span class="tag ok">执行率 91.1%</span>',spark:1,sparkUp:1},
+    {lb:'日间占比',v:'78.4%',foot:'<span class="muted">目标 72%</span>'},
+    {lb:'夜间占比',v:'4.2%',foot:'<span class="tag ok">已压低</span>'},
+    {lb:'高峰时段',v:'19:00-23:00',foot:'<span class="tag warn">占 34.6%</span>'}
+  ])
+  +'<div class="grid2">'
+  +C.panel('分时消耗（万元）','<canvas data-achart="bars" data-seed="myh2" data-h="172" data-n="24"></canvas>')
+  +C.panel('消耗 vs 转化率匹配','<canvas data-achart="dual" data-seed="mymatch" data-h="172"></canvas>')
+  +'</div>'
+  +C.note('warn','<b>19:00-23:00 消耗占 34.6%，但转化率只有 11:00-13:00 的 62%</b>。这段是 TikTok 达人素材带起来的，可以考虑把预算往白天倾斜。')
+  +C.panel('分时段表现',C.table([
+    {t:'时段',k:'seg'},
+    {t:'消耗占比',r:1,mono:1,k:'sp'},
+    {t:'转化占比',r:1,mono:1,k:'cv'},
+    {t:'转化率',r:1,f:function(r){return r.cvr}},
+    {t:'CPA',r:1,mono:1,k:'cpa'},
+    {t:'评价',f:function(r){return '<span class="tag '+(r.jd==='bad'?'bad':(r.jd==='ok'?'ok':'warn'))+'">'+esc(r.jd2)+'</span>'}}
+  ],[{seg:'00:00-06:00',sp:'4.2%',cv:'1.6%',cvr:'0.9%',cpa:'¥286',jd:'bad',jd2:'低效，建议压低'},
+     {seg:'06:00-11:00',sp:'12.4%',cv:'14.2%',cvr:'2.6%',cpa:'¥98',jd:'ok',jd2:'高效'},
+     {seg:'11:00-13:00',sp:'16.8%',cv:'24.6%',cvr:'3.8%',cpa:'¥72',jd:'ok',jd2:'最佳'},
+     {seg:'13:00-19:00',sp:'18.6%',cv:'20.4%',cvr:'2.4%',cpa:'¥104',jd:'',jd2:'正常'},
+     {seg:'19:00-23:00',sp:'34.6%',cv:'28.4%',cvr:'1.8%',cpa:'¥142',jd:'warn',jd2:'消耗高转化低'}],{rowlink:1}))
+  +C.note('info','调整节奏只改<b>时段分配、不改日预算总额</b>，所以不会触发 30% 上调熔断。')
+  +C.anno('R5');
+}};
+
+V.pers_ab={t:'我的 A/B 测试',render(){
+  return C.pagehead('我的 A/B 测试','3 个进行中 · 1 个待创建',
+    '<button class="btn p" data-act="pers-ab-new">新建测试</button><button class="btn" data-act="pers-export">导出结论</button>')
+  +krow([
+    {lb:'进行中',v:'3',foot:'其中 1 个置信度不足',spark:1},
+    {lb:'已完成',v:'11',foot:'本月'},
+    {lb:'胜出率',v:'62%',foot:'新素材替换旧素材'},
+    {lb:'平均测试时长',v:'6.2 天',foot:'<span class="tag ok">目标 ≤7 天</span>'}
+  ])
+  +C.note('warn','<b>学习期活动不能做 A/B 测试</b>：测试必然要动预算与素材，会让模型清零重学，结论也不可信。创建时系统会自动排除这类活动。')
+  +C.panel('测试列表',C.table([
+    {t:'测试',f:function(r){return '<b>'+esc(r.n)+'</b>'}},
+    {t:'活动',f:function(r){return '<span class="mono small">'+esc(r.c)+'</span>'}},
+    {t:'变量',k:'var'},
+    {t:'A / B',f:function(r){return esc(r.a)+' <span class="muted">vs</span> '+esc(r.b)}},
+    {t:'主要指标',k:'mt'},
+    {t:'当前领先',f:function(r){return '<span class="tag '+(r.win==='B'?'ok':'')+'">'+esc(r.win)+'</span>'}},
+    {t:'置信度',r:1,f:function(r){return C.progress(r.cf,r.cf>=95?'ok':'warn')+'<span class="small mono">'+r.cf+'%</span>'}},
+    {t:'状态',f:function(r){return C.st(r.st)}}
+  ],[{n:'冲锋衣卖点测试',c:'MC-7710892',var:'素材',a:'功能演示 15s',b:'户外场景 15s',mt:'CVR',win:'B',cf:94,st:'进行中'},
+     {n:'帐篷容量展示',c:'TC-3390611',var:'素材',a:'静态图组',b:'达人开箱',mt:'CTR',win:'A',cf:88,st:'进行中'},
+     {n:'睡前场景文案',c:'TC-3390728',var:'文案',a:'功能导向',b:'场景导向',mt:'CTR',win:'—',cf:62,st:'进行中'},
+     {n:'登山杖材质对比',c:'MC-7710892',var:'素材',a:'白底产品图',b:'材质特写',mt:'CTR',win:'B',cf:97,st:'已结论'}],{rowlink:1}))
+  +'<div class="grid2" style="margin-top:12px">'
+  +C.panel('测试结论趋势','<canvas data-achart="bars" data-seed="myab" data-h="166" data-n="8"></canvas>')
+  +C.panel('置信度分布','<canvas data-achart="donut" data-h="166" data-center="11" data-sub="已完成测试" data-data=\'[{"v":55},{"v":27},{"v":18}]\'></canvas>'
+    +C.legend([['置信度 >95%','#37b3a4'],['80-95%','#4f6cff'],['<80% 无结论','#f2a93b']]))
+  +'</div>';
+}};
+
+V.pers_asset={t:'我的素材',render(){
+  return C.pagehead('我的素材','6 条素材 · 1 条待复核 · 1 条已归档',
+    '<button class="btn p" data-act="pers-asset-new">上传素材</button><button class="btn" data-act="pers-asset-archive">归档违规</button>')
+  +krow([
+    {lb:'我的素材',v:'6',foot:'投放中 4 · 待审 1 · 归档 1',spark:1},
+    {lb:'平均 CTR',v:'1.65%',foot:'<span class="muted">同组均值 1.24%</span>'},
+    {lb:'待复核',v:'1',foot:'<span class="tag bad">CR-8842</span>'},
+    {lb:'已归档违规',v:'1',foot:'<span class="tag ok">含黑名单</span>',rule:'R9',ruleHow:'只下线不归档，素材轮播会重新选中它。'},
+    {lb:'本月新增',v:'8',foot:'<span class="tag ok">迭代 4 次</span>'}
+  ])
+  +C.panel('素材列表',C.table([
+    {t:'素材',f:function(r){return '<span class="mono small">'+esc(r.id)+'</span><br><b>'+esc(r.n)+'</b>'}},
+    {t:'形式',f:function(r){return '<span class="tag">'+esc(r.f)+'</span>'}},
+    {t:'平台',f:function(r){return ptag(r.p)}},
+    {t:'关联活动',f:function(r){return '<span class="mono small">'+esc(r.c)+'</span>'}},
+    {t:'消耗',r:1,mono:1,f:function(r){return money(r.sp)}},
+    {t:'CTR',r:1,mono:1,k:'ctr'},
+    {t:'CPM',r:1,mono:1,k:'cpm'},
+    {t:'转化',r:1,mono:1,k:'cv'},
+    {t:'状态',f:function(r){return C.st(r.st)}},
+    {t:'操作',f:function(){return '<span class="link" data-open="masset">详情</span>'}}
+  ],MASET,{rowlink:1}))
+  +'<div class="grid2" style="margin-top:12px">'
+  +C.panel('素材 CTR 与 CPM','<canvas data-achart="scatter" data-h="166" data-data=\'[{"x":2.4,"y":1.42,"r":30,"c":"ok","t":"功能演示"},{"x":2.8,"y":1.08,"r":24,"c":"ok","t":"登山杖UGC"},{"x":2.1,"y":1.24,"r":26,"c":"ok","t":"冲锋衣场景"},{"x":1.4,"y":0.96,"r":14,"c":"warn","t":"帐篷图组"},{"x":1.2,"y":2.42,"r":12,"c":"bad","t":"帐篷达人"},{"x":0.9,"y":2.86,"r":10,"c":"bad","t":"睡袋口播"}]\'></canvas>')
+  +C.panel('素材状态分布','<canvas data-achart="donut" data-h="166" data-center="6" data-sub="我的素材" data-data=\'[{"v":66},{"v":17},{"v":17}]\'></canvas>'
+    +C.legend([['投放中','#37b3a4'],['待复核','#f2a93b'],['已归档','#8a94a6']]))
+  +'</div>'
+  +C.note('bad','<b>CR-8842 被判医疗功效暗示</b>。若复核不通过，必须「下线 + 归档 + 写黑名单」三步同时做；只下线的话，半个月后素材轮播会重新选中它，账户再限流一次。')
+  +C.anno('R9');
+}};
+
+V.pers_sku={t:'我的 SKU',render(){
+  return C.pagehead('我的 SKU','我负责投放的 5 个 SKU · 毛利与投放表现',
+    '<button class="btn p" data-act="pers-sku-off">申请下架</button><button class="btn" data-act="pers-export">导出明细</button>')
+  +krow([
+    {lb:'我的 SKU',v:'5',foot:'覆盖 4 个品类',spark:1},
+    {lb:'毛利率均值',v:'38.8%',foot:'<span class="muted">类目目标 45%</span>'},
+    {lb:'低毛利 SKU',v:'1',foot:'<span class="tag bad">21% · 建议下架</span>',rule:'R8',ruleHow:'用店铺均值 51% 算会显示盈利，按真实毛利算是净亏损。'},
+    {lb:'30 天消耗',v:'¥70.64万',foot:'<span class="muted">我负责的活动</span>'}
+  ])
+  +C.note('bad','<b>SKU-D4088 轻量徒步鞋</b>：毛利率 21%，30 天消耗 ¥21.46万，贡献利润 <b>−¥1.86万</b>。它还在我的活动里跑着——<b>低毛利 SKU 加预算就是放大亏损</b>。')
+  +C.panel('SKU 明细',C.table([
+    {t:'SKU',f:function(r){return '<span class="mono small">'+esc(r.id)+'</span>'}},
+    {t:'商品',f:function(r){return '<b>'+esc(r.n)+'</b>'}},
+    {t:'品类',f:function(r){return '<span class="tag">'+esc(r.cat)+'</span>'}},
+    {t:'毛利率',r:1,f:function(r){return '<b class="mono" style="color:'+(r.gm>=0.45?'var(--ok)':(r.gm>=0.30?'var(--gold)':'var(--bad)'))+'">'+pc2(r.gm)+'</b>'}},
+    {t:'30 天消耗',r:1,mono:1,f:function(r){return wmoney(r.sp)}},
+    {t:'利润 ROAS',r:1,f:function(r){return roas(r.pm)}},
+    {t:'状态',f:function(r){return C.st(r.st)}}
+  ],MSKU,{rowlink:1}))
+  +'<div class="grid2" style="margin-top:12px">'
+  +C.panel('SKU 毛利 vs 消耗','<canvas data-achart="scatter" data-h="166" data-data=\'[{"x":1864,"y":38,"r":30,"c":"ok","t":"冲锋衣男"},{"x":1642,"y":36,"r":26,"c":"ok","t":"冲锋衣女"},{"x":2146,"y":21,"r":34,"c":"bad","t":"轻量徒步鞋"},{"x":426,"y":62,"r":14,"c":"ok","t":"碳纤杖"},{"x":986,"y":41,"r":18,"c":"ok","t":"单人帐篷"}]\'></canvas>'
+    +'<div class="small muted" style="margin-top:6px">右下角：消耗高但毛利低 → 重点关注区</div>')
+  +C.panel('品类毛利分布','<canvas data-achart="hbars" data-h="166" data-data=\'[["登山杖",62],["冲锋衣",37],["帐篷",41],["徒步鞋",21]]\'></canvas>')
+  +'</div>'
+  +C.anno('R8');
+}};
+
+V.pers_conv={t:'我的转化回传',render(){
+  return C.pagehead('我的转化回传','我的活动的回传成功率、时延与缺口',
+    '<button class="btn p" data-act="pers-fix-postback">排查回传</button><button class="btn" data-act="pers-refresh">立即探活</button>')
+  +krow([
+    {lb:'健康活动',v:'5 / 6',foot:'回传成功率 ≥95%',spark:1},
+    {lb:'断流活动',v:'1',foot:'<span class="tag bad">MC-7710892</span>',hl:1,rule:'R6',ruleHow:'回传断了还在花钱，这 42 分钟已烧掉 ¥24,180 无归因。'},
+    {lb:'今日回传量',v:'12.4万',foot:'<span class="tag warn">缺口 412 次</span>'},
+    {lb:'时延 P95',v:'386 ms',foot:'<span class="muted">目标 &lt;500ms</span>'},
+    {lb:'探活间隔',v:'15 分钟',foot:'连续 3 次失败熔断'}
+  ])
+  +C.note('bad','<b>MC-7710892 的 AddToCart 自 09:00 起无到达</b>。这期间我的活动在 Meta 上照常消耗，Meta 收不到转化信号会自行降竞价，但它并不知道原因。')
+  +C.panel('我的活动回传健康',C.table([
+    {t:'活动',f:function(r){return '<b>'+esc(r.n)+'</b>'}},
+    {t:'平台',f:function(r){return ptag(r.p)}},
+    {t:'成功率 24h',r:1,f:function(r){return C.progress(r.sr,r.sr>=95?'ok':(r.sr>=80?'warn':'bad'))+'<span class="small mono">'+r.sr+'%</span>'}},
+    {t:'时延 P95',r:1,mono:1,k:'lat'},
+    {t:'今日回传',r:1,mono:1,k:'v'},
+    {t:'最近断流',k:'last',mono:1},
+    {t:'状态',f:function(r){return C.st(r.st)}}
+  ],[{n:'US-IG-通投-18-34-兴趣',p:'Meta',sr:0,lat:'—',v:'缺口 412',last:'今天 09:42',st:'异常'},
+     {n:'US-FB-再营销-加购未购',p:'Meta',sr:99,lat:'312 ms',v:'4.2万',last:'10-08 短暂抖动',st:'正常'},
+     {n:'US-FB-视频观看-冷启组',p:'Meta',sr:98,lat:'386 ms',v:'2.8万',last:'—',st:'正常'},
+     {n:'US-TT-达人切片-爆量组',p:'TikTok Ads',sr:97,lat:'286 ms',v:'3.6万',last:'10-02',st:'正常'},
+     {n:'US-品牌词-精确匹配-01',p:'Google Ads',sr:99,lat:'242 ms',v:'1.8万',last:'—',st:'正常'}],{rowlink:1}))
+  +'<div class="grid2" style="margin-top:12px">'
+  +C.panel('我的回传量趋势（近 24 小时）','<canvas data-achart="area" data-seed="mypb" data-h="166"></canvas>'
+    +'<div class="small muted" style="margin-top:6px">09:00 后 AddToCart 出现断崖</div>')
+  +C.panel('回传事件明细',C.table([
+    {t:'事件',k:'n'},
+    {t:'今日应回传',r:1,mono:1,k:'a'},
+    {t:'今日实回传',r:1,mono:1,k:'b'},
+    {t:'缺口',r:1,f:function(r){return r.a-r.b>0?'<b style="color:var(--bad)">'+money(r.a-r.b)+'</b>':'<span class="tag ok">0</span>'}},
+    {t:'去重键',k:'k'}
+  ],[{n:'AddToCart',a:2142,b:1730,k:'order_id'},{n:'InitiateCheckout',a:864,b:864,k:'order_id'},
+     {n:'Purchase',a:486,b:486,k:'order_id'},{n:'Refund',a:28,b:28,k:'order_id'}],{rowlink:1}))
+  +'</div>'
+  +C.anno('R6');
+}};
+
+V.pers_roi={t:'我的效果核算',render(){
+  return C.pagehead('我的效果核算','利润口径的效果核算 · 与 GMV 口径的差异对照',
+    '<button class="btn p" data-act="pers-roi-set">核算口径</button><button class="btn" data-act="pers-export">导出</button>')
+  +krow([
+    {lb:'我的利润 ROAS',v:'1.62',foot:'<span class="muted">GMV 口径 3.24</span>',hl:1,rule:'R2',ruleHow:'GMV 口径 3.24 会让我以为在赚钱，利润口径只有 1.62。差的这 1.62 全是成本。'},
+    {lb:'今日利润',v:'¥13.3万',foot:'<span class="tag ok">+8.4%</span>'},
+    {lb:'退款冲减',v:'¥4.86万',foot:'<span class="tag ok">已回写活动</span>',rule:'R3',ruleHow:'退款到账即冲减，不冲减的话 ROAS 会虚高 20%-40%。'},
+    {lb:'我的 CPA',v:'¥168.42',foot:'类目目标 ¥142',spark:1,sparkUp:0},
+    {lb:'亏损活动',v:'2',foot:'<span class="tag bad">冷启组 / 达人组</span>'}
+  ])
+  +'<div class="grid2">'
++C.panel('我的活动两口径对比','<canvas data-achart="hbars" data-h="178" data-data=\'[ ["IG通投 GMV 2.86",2.86],["IG通投 利润 1.34",1.34],["再营销 GMV 5.12",5.12],["再营销 利润 2.88",2.88], ["冷启 GMV 1.68",1.68],["冷启 利润 0.74",0.74],["达人 GMV 1.94",1.94],["达人 利润 0.86",0.86]]\'></canvas>'
+    +'<div class="small muted" style="margin-top:6px">每个活动上下两行为 GMV 口径与利润口径</div>')
++C.panel('利润拆解（今日）','<canvas data-achart="waterfall" data-h="178" data-data=\'[ {"l":"营收 GMV","v":412000},{"l":"退款冲减","v":-48600},{"l":"货品成本","v":-186000},{"l":"履约与运费","v":-74000},{"l":"平台费","v":-24800},{"l":"广告消耗","v":-82000},{"l":"净利润","v":-4600}]\'></canvas>')
+  +'</div>'
+  +C.note('bad','<b>今日按利润口径算其实是亏的 ¥4,600</b>：营收 ¥41.2万，扣掉退款、货品、履约、平台费后只剩 ¥13.3万，而广告花了 ¥8.2万。如果只看 GMV ROAS 3.24，完全看不出这一点。')
+  +C.panel('我的活动核算明细',C.table([
+    {t:'活动',f:function(r){return '<b>'+esc(r.n)+'</b>'}},
+    {t:'平台',f:function(r){return ptag(r.p)}},
+    {t:'消耗',r:1,mono:1,k:'sp'},
+    {t:'营收',r:1,mono:1,k:'gmv'},
+    {t:'GMV ROAS',r:1,f:function(r){return '<span class="mono muted">'+r.roas.toFixed(2)+'</span>'}},
+    {t:'利润 ROAS',r:1,f:function(r){return roas(r.pm)}},
+    {t:'两口径差',r:1,f:function(r){return '<b style="color:var(--bad)">−'+(r.roas-r.pm).toFixed(2)+'</b>'}}
+  ],MC.map(function(c){return {n:c.n,p:c.p,sp:c.sp,gmv:c.gmv,roas:c.roas,pm:c.pm}}),{rowlink:1}))
+  +C.anno('R2')+C.anno('R3');
+}};
+
+V.pers_perf={t:'我的绩效',render(){
+  return C.pagehead('我的绩效','10 月 · 按利润口径计分',
+    '<button class="btn p" data-act="perf-note">提交自评</button><button class="btn" data-act="pers-export">导出明细</button>')
+  +krow([
+    {lb:'本月综合得分',v:'86',foot:'<span class="tag ok">B+ · 团队第 3</span>',spark:1,sparkUp:1,hl:1},
+    {lb:'利润 ROAS 提升',v:'+0.28',foot:'1.34 → 1.62'},
+    {lb:'止损及时率',v:'100%',foot:'<span class="tag ok">14 次告警全部处置</span>'},
+    {lv:'',lb:'素材迭代次数',v:'4',foot:'<span class="muted">目标 5 次</span>'},
+    {lb:'学习期 CPA',v:'¥186',foot:'<span class="tag warn">高于团队均值 ¥143</span>'}
+  ])
+  +C.note('info','绩效按<b>利润口径</b>计分。用 GMV 口径自评会高估成绩，也会在复盘时被直接质疑。')
+  +'<div class="grid2">'
+  +C.panel('绩效维度雷达','<canvas data-achart="radar" data-h="178" data-axes=\'["利润ROAS","CPA控制","止损及时","素材质量","回传稳定","合规意识"]\' data-a=\'[72,68,100,84,78,86]\' data-b=\'[88,82,92,88,94,90]\'></canvas>'
+    +'<div class="small muted" style="margin-top:6px">品牌色：我 · 金色：团队 Top20% 基准</div>')
+  +C.panel('得分构成',C.pgrp([['利润 ROAS 提升',72,'warn','18/25'],['CPA 控制',68,'warn','17/25'],['止损及时性',100,'ok','25/25'],['素材质量',84,'ok','21/25'],['回传稳定性',78,'warn','12/15'],['合规意识',86,'ok','11/13']]))
+  +'</div>'
+  +C.panel('我的月度表现',C.table([
+    {t:'月份',k:'m',mono:1},
+    {t:'消耗',r:1,mono:1,k:'sp'},
+    {t:'利润',r:1,mono:1,k:'pf'},
+    {t:'利润 ROAS',r:1,f:function(r){return roas(r.pr)}},
+    {t:'止损次数',r:1,mono:1,k:'sl'},
+    {t:'平均响应',r:1,mono:1,k:'rt'},
+    {t:'得分',r:1,f:function(r){return '<b class="mono">'+r.sc+'</b>'}}
+  ],[{m:'2026-10',sp:'186.4万',pf:'30.2万',pr:1.62,sl:14,rt:'18 min',sc:86},
+     {m:'2026-09',sp:'164.2万',pf:'22.4万',pr:1.36,sl:11,rt:'24 min',sc:78},
+     {m:'2026-08',sp:'142.8万',pf:'18.6万',pr:1.30,sl:9,rt:'31 min',sc:74}],{rowlink:1}))
+  +C.note('warn','<b>学习期 CPA ¥186 高于团队均值 ¥143</b>，是我得分的主要失分项。原因是我负责的 3 个活动在建期时被改了定向。建议后续建期活动一律不改结构。')
+  +C.anno('R4');
+}};
+
+V.pers_pref={t:'我的偏好设置',render(){
+  return C.pagehead('我的偏好设置','工作台偏好 · 通知 · 调价建议自动执行',
+    '<button class="btn p" data-act="pers-pref-set">编辑设置</button><button class="btn" data-act="pers-export">导出配置</button>')
+  +krow([
+    {lb:'我的角色',v:'优化师',foot:'Meta & TikTok · 6 个活动',spark:1},
+    {lb:'权限范围',v:'活动级',foot:'预算单次 ≤30%',rule:'R10',ruleHow:'权限收敛到活动级，是为了让一次误操作只影响一个活动。'},
+    {lb:'建议自动执行',v:'已关闭',foot:'<span class="tag warn">全部需我确认</span>'},
+    {lb:'主管',v:'周砚',foot:'投放经理'}
+  ])
+  +C.panel('我的权限',C.matrix(
+    ['我的 6 个活动','他人负责的活动','我负责的 SKU'],
+    ['查看报表','调整预算','调整出价','建/停活动','上传素材','改归因口径'],
+    [[1,1,1,1,1,0],[1,0,0,0,0,0],[1,0,1,1,0,0]],
+    {tip:function(i,j,v){return ['我的 6 个活动','他人负责的活动','我负责的 SKU'][i]+' 对「'+['查看报表','调整预算','调整出价','建/停活动','上传素材','改归因口径'][j]+'」权限：'+(v?'允许':'禁止')},legend:'<span class="mx-l1"></span>允许 <span class="mx-l3"></span>禁止'}))
+  +'<div class="divider"></div>'
+  +C.panel('我的偏好',C.table([
+    {t:'偏好项',f:function(r){return '<b>'+esc(r.n)+'</b>'}},
+    {t:'当前设置',f:function(r){return '<span class="mono">'+esc(r.v)+'</span>'}},
+    {t:'说明',k:'d'},
+    {t:'操作',f:function(){return '<span class="link" data-act="pers-pref-set">修改</span>'}}
+  ],[{n:'默认落地页',v:'我的投放驾驶舱',d:'打开系统先看驾驶舱'},
+     {n:'数据刷新频率',v:'1 分钟',d:'回传延迟 4 分钟内时无需更快'},
+     {n:'告警推送',v:'回传断流 / 熔断拦截 / 合规命中',d:'这三类必须推送'},
+     {n:'调价建议频次',v:'每 3 小时',d:'高频时容易疲劳决策'},
+     {n:'自动执行阈值',v:'关闭',d:'建议均由我手动确认'},
+     {n:'绩效自评周期',v:'每周（W42）',d:'周频自评便于及时纠偏'}],{rowlink:1}))
+  +C.note('info','自动执行若开启，只对<b>置信度 ≥0.90 且幅度 ≤10%</b> 的建议生效；涉及学习期活动一律不自动执行。')
+  +C.anno('R10');
+}};
+
+boot();
+</script>
+</body>
+</html>
